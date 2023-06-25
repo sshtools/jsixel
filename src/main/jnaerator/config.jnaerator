@@ -1,0 +1,7 @@
+-library sixel
+/usr/include/sixel/sixel.h
+-o src/main/java
+-v
+-noJar
+-noComp
+-runtime JNA
