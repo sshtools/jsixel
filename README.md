@@ -51,6 +51,4 @@ The module to pick will depend on the GUI toolkit (if any) you wish to use.
 ## TODO 
  * Graal compatibility.
  * Animation support.
- * SWT toolkit module.
  * More pre-built libraries for different platforms and architectures.
- * More decoding options.
