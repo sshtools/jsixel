@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.sshtools</groupId>
+		<artifactId>jsixel</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+	</parent>
+	<artifactId>jsixel-converters</artifactId>
+	<properties>
+		<graalvm.version>21.2.0</graalvm.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.sshtools</groupId>
+			<artifactId>jsixel-lib</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.7.4</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>info.picocli</groupId>
+							<artifactId>picocli-codegen</artifactId>
+							<version>4.7.4</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<!-- Graal Native Image -->
+		<profile>
+			<id>native-image</id>
+
+			<dependencies>
+				<dependency>
+					<groupId>org.graalvm.sdk</groupId>
+					<artifactId>graal-sdk</artifactId>
+					<version>${graalvm.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.nativeimage</groupId>
+						<artifactId>native-image-maven-plugin</artifactId>
+						<version>${graalvm.version}</version>
+						<executions>
+							<execution>
+								<id>jimg2sixel-exe</id>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<mainClass>com.sshtools.jsixel.converters.Img2Sixel</mainClass>
+									<imageName>jimg2sixel</imageName>
+									<buildArgs>--allow-incomplete-classpath --report-unsupported-elements-at-runtime</buildArgs>
+								</configuration>
+							</execution>
+							<execution>
+								<id>jsixel2png-exe</id>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<mainClass>com.sshtools.jsixel.converters.Sixel2Png</mainClass>
+									<imageName>jimg2sixel</imageName>
+									<buildArgs>--allow-incomplete-classpath --report-unsupported-elements-at-runtime</buildArgs>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
