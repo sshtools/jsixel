@@ -60,6 +60,10 @@ GUI toolkit if you are using one of [Swing/AWT](../swing/README.md), [JavaFX](..
 [SWT](../swt/README.md). Or pick the [Slim](../slim/READ.me) module for command line applications where
 you might not want to depend on a full GUI toolkit.
 
+You will need this API if you intend to working with image sources and targets other than local files
+(`Path` and `File`). If you need to work with classpath resources, `InputStream`, `OutputStream`, `WritableChannel`, `ReadableChannel`, `URL`, `ByteBuffer`, 
+, `byte[]` and `String`, this is the API for you. 
+
 For most cases, you just need to ensure the optional module is on the classpath and included in
 `module-info.java` if you are using JPMS. 
 
@@ -76,6 +80,16 @@ var enc = new Bitmap2SixelBuilder().
 		fromResource("jsixel.png", JSixel.class).
 		build();
 enc.write(System.out);		
+```
+
+As a second example showing the loading of the same PNG image, setting of encoding options, and obtaining a `ByteBuffer` of sixel data.
+
+```java
+var enc = new Bitmap2SixelBuilder().
+		fromResource("jsixel.png", JSixel.class).
+		withPalette(BuiltInPalette.MONO_DARK).
+		build();
+var buf = enc.toByteBuffer();		
 ```
 
 #### Using a specific Bitmap type
