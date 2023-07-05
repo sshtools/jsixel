@@ -16,7 +16,7 @@ decoders found in the [Slim LWJGL Library](https://github.com/mattdesl/slim/tree
 <dependency>
 	<groupId>com.sshtools</groupdId>
 	<artifactId>jsixel-slim</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 

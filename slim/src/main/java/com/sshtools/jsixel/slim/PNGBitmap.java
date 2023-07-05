@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 import com.sshtools.jsixel.lib.bitmap.FormatType;
 import com.sshtools.jsixel.lib.bitmap.PixelFormat;
@@ -125,7 +126,7 @@ public class PNGBitmap implements SlimBitmap {
 	}
 
 	@Override
-	public byte[] palette() {
-		return decoder.palette;
+	public Optional<byte[]> palette() {
+		return Optional.ofNullable(decoder.palette);
 	}
 }

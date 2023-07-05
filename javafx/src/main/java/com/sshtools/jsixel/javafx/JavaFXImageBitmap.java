@@ -34,6 +34,7 @@ public final class JavaFXImageBitmap implements Bitmap {
 			return this;
 		}
 
+		@SuppressWarnings("resource")
 		@Override
 		public JavaFXImageBitmap build() {
 			if (image.isPresent()) {
@@ -171,13 +172,13 @@ public final class JavaFXImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public byte[] palette() {
+	public Optional<byte[]> palette() {
 		if(format.indexed()) {
 			/* TODO: cant find how to do this (yet i hope) */
 			throw new UnsupportedOperationException();
 		}
 		else {
-			return new byte[0];
+			return Optional.empty();
 		}
 	}
 

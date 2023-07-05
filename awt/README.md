@@ -11,7 +11,7 @@ to sixel data, or decoding sixel data to a BufferedImage.
 <dependency>
 	<groupId>com.sshtools</groupdId>
 	<artifactId>jsixel-awt</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 

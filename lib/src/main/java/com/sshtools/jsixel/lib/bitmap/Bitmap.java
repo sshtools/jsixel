@@ -106,5 +106,5 @@ public interface Bitmap {
 
 	PixelFormat pixelFormat();
 
-	byte[] palette();
+	Optional<byte[]> palette();
 }

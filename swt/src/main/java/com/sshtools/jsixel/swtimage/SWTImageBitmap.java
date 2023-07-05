@@ -48,6 +48,7 @@ public final class SWTImageBitmap implements Bitmap {
 			return this;
 		}
 
+		@SuppressWarnings("resource")
 		@Override
 		public SWTImageBitmap build() {
 			if (image.isPresent()) {
@@ -63,7 +64,7 @@ public final class SWTImageBitmap implements Bitmap {
 							switch (bm.pixelFormat()) {
 							case PAL8:
 								img = new ImageData(bm.width(), bm.height(), bm.bitsPerPixel(),
-										rgbPaletteToPaletteData(bm.pixelFormat(), bm.palette()));
+										rgbPaletteToPaletteData(bm.pixelFormat(), bm.palette().orElseThrow(() -> new IllegalStateException("Bitmap has no palette."))));
 								break;
 							default:
 								throw new UnsupportedOperationException();
@@ -92,7 +93,7 @@ public final class SWTImageBitmap implements Bitmap {
 	private final ImageData image;
 	private final PixelFormat format;
 	private final FormatType formatType;
-	private final byte[] palette;
+	private final Optional<byte[]> palette;
 
 	private SWTImageBitmap(ImageData image) {
 		this.image = image;
@@ -158,7 +159,7 @@ public final class SWTImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public byte[] palette() {
+	public Optional<byte[]> palette() {
 		return palette;
 	}
 
@@ -191,9 +192,9 @@ public final class SWTImageBitmap implements Bitmap {
 		return new PaletteData(l);
 	}
 
-	private byte[] calcPalette(ImageData image) {
+	private Optional<byte[]> calcPalette(ImageData image) {
 		if (image.palette.isDirect)
-			return new byte[0];
+			return Optional.empty();
 		else {
 			var b = new byte[image.palette.colors.length * 3];
 			for (int i = 0; i < image.palette.colors.length; i++) {
@@ -202,7 +203,7 @@ public final class SWTImageBitmap implements Bitmap {
 				b[(i * 3) + 1] = (byte) rgb.green;
 				b[(i * 3) + 2] = (byte) rgb.blue;
 			}
-			return b;
+			return Optional.of(b);
 		}
 	}
 

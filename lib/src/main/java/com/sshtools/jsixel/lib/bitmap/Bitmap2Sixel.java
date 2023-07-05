@@ -21,7 +21,15 @@ import com.sun.jna.ptr.PointerByReference;
 public final class Bitmap2Sixel implements SixelConverter {
 
 	public static class Bitmap2SixelBuilder {
+		private Optional<Boolean> optimizePalette = Optional.empty();
+		private Optional<Integer> colors = Optional.empty();
+		private Optional<Quality> quality = Optional.empty();
+		private Optional<BuiltInPalette> builtInPalette = Optional.empty();
+		private Optional<Integer> complexionScore = Optional.empty();
+		private Optional<Integer> transparent = Optional.empty();
 		private Optional<Bitmap> bitmap = Optional.empty();
+		private Optional<byte[]> palette = Optional.empty();
+		private Optional<Diffuse> diffuse = Optional.empty();
 		private Optional<InputStream> stream = Optional.empty();
 		private Optional<Path> path = Optional.empty();
 		private Optional<URL> url = Optional.empty();
@@ -74,6 +82,46 @@ public final class Bitmap2Sixel implements SixelConverter {
 			return this;
 		}
 
+		public Bitmap2SixelBuilder withColors(int colors) {
+			this.colors = Optional.of(colors);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withComplexionScore(int complexionScore) {
+			this.complexionScore = Optional.of(complexionScore);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withTransparent(int transparent) {
+			this.transparent = Optional.of(transparent);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withOptimizePalette(boolean optimizePalette) {
+			this.optimizePalette = Optional.of(optimizePalette);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withDiffuse(Diffuse diffuse) {
+			this.diffuse = Optional.of(diffuse);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withPalette(byte[] palette) {
+			this.palette = Optional.of(palette);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withQuality(Quality quality) {
+			this.quality = Optional.of(quality);
+			return this;
+		}
+
+		public Bitmap2SixelBuilder withPalette(BuiltInPalette builtInPalette) {
+			this.builtInPalette = Optional.of(builtInPalette);
+			return this;
+		}
+
 		public Bitmap2Sixel build() throws IOException {
 			return new Bitmap2Sixel(this);
 		}
@@ -81,6 +129,14 @@ public final class Bitmap2Sixel implements SixelConverter {
 
 	private final Bitmap bitmap;
 	private final ByteBuffer data;
+	private final int colors;
+	private final Optional<Diffuse> diffuse;
+	private final Optional<Boolean> optimizePalette;
+	private final Optional<Integer> complexionScore;
+	private final Optional<byte[]> palette;
+	private final Optional<Quality> quality;
+	private final Optional<BuiltInPalette> builtInPalette;
+	private final Optional<Integer> transparent;
 
 	private Bitmap2Sixel(Bitmap2SixelBuilder builder) throws IOException {
 		if (builder.bitmap.isPresent())
@@ -108,6 +164,14 @@ public final class Bitmap2Sixel implements SixelConverter {
 		}
 
 		data = bitmap.data();
+		colors = builder.colors.orElse(255);
+		diffuse = builder.diffuse;
+		palette = builder.palette.or(() -> bitmap.palette());
+		complexionScore = builder.complexionScore;
+		optimizePalette = builder.optimizePalette;
+		quality = builder.quality;
+		builtInPalette = builder.builtInPalette;
+		transparent = builder.transparent;
 	}
 
 	private BitmapCodec<?, ?> getCodec() {
@@ -147,36 +211,59 @@ public final class Bitmap2Sixel implements SixelConverter {
 
 		doOutput(output);
 	}
+	
+	private PointerByReference createDither() {
+		if (builtInPalette.isPresent())
+			return LibSixel.INSTANCE.sixel_dither_get(builtInPalette.get().code());
+		else {
+			switch (bitmap.formatType()) {
+			case COLOR:
+				var dither = LibSixel.INSTANCE.sixel_dither_create(colors); 
+				LibSixelExtensions.throwIfFailed(LibSixel.INSTANCE.sixel_dither_initialize(dither, data, bitmap.width(), bitmap.height(),
+						bitmap.pixelFormat().code(), 0, 0, quality.map(Quality::code).orElse(0)));
+				return dither;
+			case PALETTE:
+				return LibSixel.INSTANCE.sixel_dither_create(colors);
+			case GRAYSCALE:
+				switch (bitmap.pixelFormat()) {
+				case G1:
+					return LibSixel.INSTANCE.sixel_dither_get(LibSixel.SIXEL_BUILTIN_G1);
+				default:
+					return LibSixel.INSTANCE.sixel_dither_get(LibSixel.SIXEL_BUILTIN_G8);
+				}
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+	}
 
 	private void doOutput(PointerByReference output) {
 		try {
-			PointerByReference dither = null;
+			PointerByReference dither = createDither();
 			try {
-				switch (bitmap.formatType()) {
-				case COLOR:
-					dither = LibSixel.INSTANCE.sixel_dither_create(255);
-					LibSixelExtensions.throwIfFailed(LibSixel.INSTANCE.sixel_dither_initialize(dither, data, bitmap.width(), bitmap.height(),
-							bitmap.pixelFormat().pixelFormatCode(), 0, 0, 0));
-					break;
-				case PALETTE:
-					dither = LibSixel.INSTANCE.sixel_dither_create(255);
-					LibSixel.INSTANCE.sixel_dither_set_palette(dither, ByteBuffer.wrap(bitmap.palette()));
-					LibSixel.INSTANCE.sixel_dither_set_pixelformat(dither, bitmap.pixelFormat().pixelFormatCode());
-					break;
-				case GRAYSCALE:
-					switch (bitmap.pixelFormat()) {
-					case G1:
-						dither = LibSixel.INSTANCE.sixel_dither_get(LibSixel.SIXEL_BUILTIN_G1);
-					default:
-						dither = LibSixel.INSTANCE.sixel_dither_get(LibSixel.SIXEL_BUILTIN_G8);
-					}
-					LibSixel.INSTANCE.sixel_dither_set_pixelformat(dither, bitmap.pixelFormat().pixelFormatCode());
-					break;
-				default:
-					throw new UnsupportedOperationException();
+				LibSixel.INSTANCE.sixel_dither_set_pixelformat(dither, bitmap.pixelFormat().code());
+				
+				if(palette.isPresent()) {
+					LibSixel.INSTANCE.sixel_dither_set_palette(dither, ByteBuffer.wrap(palette.get()));
+				}
+				
+				if(diffuse.isPresent()) {
+					LibSixel.INSTANCE.sixel_dither_set_diffusion_type(dither, diffuse.get().code());
+				}
+				
+				if(complexionScore.isPresent()) {
+					LibSixel.INSTANCE.sixel_dither_set_complexion_score(dither, complexionScore.get());
+				}
+				
+				if(optimizePalette.isPresent()) {
+					LibSixel.INSTANCE.sixel_dither_set_optimize_palette(dither, optimizePalette.get() ? 0 : 1);
+				}
+				
+				if(transparent.isPresent()) {
+					LibSixel.INSTANCE.sixel_dither_set_transparent(dither, transparent.get());
 				}
 
-				LibSixelExtensions.throwIfFailed(LibSixel.INSTANCE.sixel_encode(data, bitmap.width(), bitmap.height(), 1, dither, output));
+				LibSixelExtensions.throwIfFailed(LibSixel.INSTANCE.sixel_encode(data, bitmap.width(), bitmap.height(), bitmap.bitsPerPixel(), dither, output));
 			} finally {
 				if (dither != null)
 					LibSixel.INSTANCE.sixel_dither_unref(dither);

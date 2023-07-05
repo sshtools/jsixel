@@ -34,15 +34,19 @@ The module to pick will depend on the GUI toolkit (if any) you wish to use.
  * [Slim](slim/README.md) basic decoder (For PNG, JPEG and BMP only at the moment).
  * Supply and consume raw [RGB/A](lib/README.md) and indexed data via `ByteBuffer`.
  
- Each module has slightly different capabilities. Some modules do not currently support decoding at all.
+ Each module has slightly different capabilities.
  
  | Module | Toolkit | Encode Image File -> Sixel File | Decode Sixel File -> Image File | Encode Sixel Stream -> Image Stream | Decode Sixel Stream -> Image Stream |
  | ------ | ------- | ------------------------------- | ------------------------------- | ----------------------------------- | ----------------------------------- |
  | None   | Any | Yes | Yes | No | No |
  | [jsixel-awt](awt/README.MD) | Swing/AWT | Yes | Yes | Yes | Yes |
- | [jsixel-javafx](javafx/README.MD) | JavaFX | Yes | No | Yes | No |
- | [jsixel-swt](swt/README.MD) | JavaFX | Yes | No | Yes | No |
- | [jsixel-slim](slim/README.MD) | None | Yes | No | Yes | No |
+ | [jsixel-javafx](javafx/README.MD) | JavaFX | Yes | Raw Only | Yes | Raw Only |
+ | [jsixel-swt](swt/README.MD) | SWT | Yes | Raw Only | Yes | Raw Only |
+ | [jsixel-slim](slim/README.MD) | None | Yes | Raw Only | Yes | Raw Only |
+ 
+  * While all modules support raw bitmaps, *Raw Only* means it will only decode to raw indexed bitmaps (as supplied by libsixel). 
+  * All other modules can in theory at least load all of the image types the toolkit supports, although at this
+    stage there may be some bugs in lesser used formats. Only AWT and SWT can currently save to specialised image formats.   
  
 ## TODO 
  * Graal compatibility.

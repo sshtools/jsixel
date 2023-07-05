@@ -41,6 +41,7 @@ public final class AWTImageBitmap implements Bitmap {
 			return this;
 		}
 
+		@SuppressWarnings("resource")
 		@Override
 		public AWTImageBitmap build() {
 			if (image.isPresent()) {
@@ -56,7 +57,7 @@ public final class AWTImageBitmap implements Bitmap {
 							var bm = bitmap.get();
 							var t = calcType(bm);
 							if(bm.formatType() == FormatType.PALETTE) {
-								var cm = rgbPaletteToColorModel(bm.pixelFormat(), bm.palette());
+								var cm = rgbPaletteToColorModel(bm.pixelFormat(), bm.palette().orElseThrow(() -> new IllegalStateException("Bitmap has no palette.")));
 								img = new BufferedImage(bm.width(), bm.height(), t, cm);
 							}
 							else if(bm.formatType() == FormatType.GRAYSCALE) {
@@ -98,11 +99,13 @@ public final class AWTImageBitmap implements Bitmap {
 	private final BufferedImage image;
 	private final PixelFormat format;
 	private final FormatType formatType;
+	private final Optional<byte[]> palette;
 
 	private AWTImageBitmap(BufferedImage image) {
 		this.image = image;
 		format = calcFormat(image.getType(), image.getColorModel().getPixelSize());
 		formatType = calcType(image);
+		palette = calcPalette();
 	}
 
 	@Override
@@ -144,12 +147,8 @@ public final class AWTImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public byte[] palette() {
-		var cm = image.getColorModel();
-		if (cm instanceof IndexColorModel) {
-			throw new UnsupportedOperationException("TODO");
-		}
-		return new byte[0];
+	public Optional<byte[]> palette() {
+		return palette;
 	}
 
 	@Override
@@ -164,6 +163,25 @@ public final class AWTImageBitmap implements Bitmap {
 
 	RenderedImage image() {
 		return image;
+	}
+
+
+	private Optional<byte[]> calcPalette() {
+		var cm = image.getColorModel();
+		if (cm instanceof IndexColorModel) {
+			var cmIndexed = (IndexColorModel)cm;
+			var pal = new int[cmIndexed.getMapSize()];
+			cmIndexed.getRGBs(pal);
+			var bytePal = new byte[pal.length * 3];
+			for(int i = 0 ; i < pal.length; i++) {
+				bytePal[i * 3] = (byte)(pal[i] >> 16 & 0xff); 
+				bytePal[(i * 3) + 1] = (byte)(pal[i] >> 8 & 0xff); 
+				bytePal[(i * 3) + 2] = (byte)(pal[i] & 0xff);
+			}
+			return Optional.of(bytePal);
+		}
+		else
+			return Optional.empty();
 	}
 
 	private PixelFormat calcFormat(int type, int bpp) {

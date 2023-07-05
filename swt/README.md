@@ -13,7 +13,7 @@ Sixels can be generated from and saved to all image formats supported by SWT (PN
 <dependency>
 	<groupId>com.sshtools</groupdId>
 	<artifactId>jsixel-swt</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 

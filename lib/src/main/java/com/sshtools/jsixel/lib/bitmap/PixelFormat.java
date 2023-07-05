@@ -6,7 +6,7 @@ public enum PixelFormat {
 	RGB555, RGB565, RGB888, BGR555, BGR565, BGR888, ARGB8888, RGBA8888, ABGR8888, BGRA8888, 
 	G1, G2, G4, G8, AG88, GA88, PAL1, PAL2, PAL4, PAL8;
 
-	public int pixelFormatCode() {
+	public int code() {
 		switch(this) {
 		case RGB555:
 			return LibSixel.SIXEL_PIXELFORMAT_RGB555;

@@ -35,7 +35,7 @@ public final class RawBitmap implements Bitmap {
 	private final ByteBuffer data;
 	private final int width;
 	private final int height;
-	private final byte[] palette;
+	private final Optional<byte[]> palette;
 	private final int bitsPerPixel;
 
 	private RawBitmap(RawBitmapBuilder builder) {
@@ -59,7 +59,7 @@ public final class RawBitmap implements Bitmap {
 				throw new IllegalStateException("Data or stream must be specified.");
 
 		});
-		this.palette = builder.palette.orElse(new byte[0]);
+		this.palette = builder.palette;
 		this.bitsPerPixel = builder.bitsPerPixel.orElse(this.data.remaining() / (this.width * this.height));
 	}
 
@@ -99,7 +99,7 @@ public final class RawBitmap implements Bitmap {
 	}
 
 	@Override
-	public byte[] palette() {
+	public Optional<byte[]> palette() {
 		return palette;
 	}
 

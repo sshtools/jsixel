@@ -14,7 +14,7 @@ but may *not* yet be saved in those formats.
 <dependency>
 	<groupId>com.sshtools</groupdId>
 	<artifactId>jsixel-javafx</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
