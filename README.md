@@ -28,8 +28,8 @@ and targets other than files using an object oriented API.
 
 The module to pick will depend on the GUI toolkit (if any) you wish to use.  
 
- * [Swing/AWT using](awt/README.MD) using `BufferedImage`.
- * [JavaFX](javafx/README.MD) using `Image`.
+ * [Swing/AWT using](awt/README.md) using `BufferedImage`.
+ * [JavaFX](javafx/README.md) using `Image`.
  * [SWT](swt/README.md) using `ImageData`.
  * [Slim](slim/README.md) basic decoder (For PNG, JPEG and BMP only at the moment).
  * Supply and consume raw [RGB/A](lib/README.md) and indexed data via `ByteBuffer`.
