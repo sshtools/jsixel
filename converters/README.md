@@ -2,7 +2,13 @@
 
 This module provides Java clones of the `img2sixel` and `sixel2png` utilities the come with `libsixel`.
 
-## Usage
+*[Back To JSixel](../README.md)* 
+
+## jimg2sixel
+
+Converts files (or standard input) in a variety of images formats into sixel files or standard output.
+
+### Usage
 
 ```
 Usage: jimg2sixel [-78DegHiIkPRSuv] [-b=BUILTINPALETTE] [-B=BGCOLOR] [-c=REGION] [-C=COMPLEXIONSCORE] [-d=DIFFUSIONTYPE] [-E=ENCODEPOLICY] [-f=FINDTYPE] [-h=HEIGHT]
@@ -58,3 +64,21 @@ Convert an image to Sixel stream
   -w, --width=WIDTH       resize image to specified width. WIDTH is represented by the following syntax. valid values: AUTO, <number>%, <number>, <number>px
 
 ```
+## jsixel2png
+
+Converts sixel files (or standard input) into PNG image files or standard output.
+
+### Usage
+
+```
+Usage: jsixel2png [-HV] [-i=PATH] [-o=PATH]
+convert DEC SIXEL images into PNG format images
+  -H, --help          show this help
+  -i, --input=PATH    specify input file
+  -o, --output=PATH   specify output file
+  -V, --version       show version info
+
+```
+
+## Programmatic Usage
+

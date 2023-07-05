@@ -5,7 +5,7 @@ encode `ImageData` to sixel data, or decoding sixel data to `ImageData`.
 
 Sixels can be generated from and saved to all image formats supported by SWT (PNG, JPEG, GIF etc).
 
-*[Back To JSixel](../README.MD)* 
+*[Back To JSixel](../README.md)* 
 
 ## Quick Start
 

@@ -6,7 +6,7 @@ to sixel data, or decoding sixel data to an `Image`.
 Sixels can be generated from all image formats supported by Java (PNG, JPEG, GIF etc),
 but may *not* yet be saved in those formats. 
 
-*[Back To JSixel](../README.MD)* 
+*[Back To JSixel](../README.md)* 
 
 # Quick Start
 

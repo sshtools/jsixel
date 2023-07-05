@@ -3,6 +3,8 @@
 This module lets you use `BufferedImage` from Java's Swing/AWT, allow you to either encode a BufferedImage
 to sixel data, or decoding sixel data to a BufferedImage. 
 
+*[Back To JSixel](../README.md)* 
+
 ## Quick Start
 
 ```xml

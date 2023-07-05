@@ -6,7 +6,9 @@ Swing/AWT or JavaFX, making it ideal from command line applications where you ar
 to want Sixel support.
 
 It does *not* support decoding of Sixel into any of these formats, and is based on some simple
-decoders found in the [Slim LWJGL Library](https://github.com/mattdesl/slim/tree/master/slim/src/slim/texture/io).   
+decoders found in the [Slim LWJGL Library](https://github.com/mattdesl/slim/tree/master/slim/src/slim/texture/io).
+
+*[Back To JSixel](../README.md)*    
 
 ## Quick Start
 
