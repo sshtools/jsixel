@@ -1,4 +1,4 @@
-# jsixel-bufferedimage
+# jsixel-slim
 
 This module lets you lets you encode `PNG`, `JPEG` and `BMP` format images from any source to Sixel
 image data streams. This is done without the weight of having to use a full toolkit such as
