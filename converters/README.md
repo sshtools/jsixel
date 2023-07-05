@@ -1,4 +1,4 @@
-# jsixel-converts
+# jsixel-converters
 
 This module provides Java clones of the `img2sixel` and `sixel2png` utilities the come with `libsixel`.
 
