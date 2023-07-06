@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import com.sshtools.jsixel.awt.AWTImageCodec;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.awt.AWTImageLoader;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 
 module com.sshtools.jsixel.awt {
 	exports com.sshtools.jsixel.awt;
 	requires transitive java.desktop;
 	requires transitive com.sshtools.jsixel.lib;
 	
-	provides BitmapCodec with AWTImageCodec;
+	provides BitmapLoader with AWTImageLoader;
 }

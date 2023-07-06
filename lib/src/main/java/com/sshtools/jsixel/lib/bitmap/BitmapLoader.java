@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.sshtools.jsixel.lib.bitmap.Bitmap.BitmapBuilder;
 
-public interface BitmapCodec<BITMAP extends Bitmap, BUILDER extends BitmapBuilder<?, BITMAP>> {
+public interface BitmapLoader<BITMAP extends Bitmap, BUILDER extends BitmapBuilder<?, BITMAP>> {
 	
 	public enum ImageType {
 		PNG, JPEG, BMP, GIF, OTHER

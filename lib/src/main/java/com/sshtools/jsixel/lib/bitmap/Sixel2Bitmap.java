@@ -139,7 +139,7 @@ public final class Sixel2Bitmap implements SixelConverter {
 		throwIfFailed(LibSixel.INSTANCE.sixel_decode_raw(sixelData, rem, imageRef, realWidth, realHeight, palData,
 				nColors, (PointerByReference) null));
 
-		var nColorsVal = nColors.get();
+		var nColorsVal = nColors.get(0);
 
 		var realWidthVal = realWidth.get();
 		var realHeightVal = realHeight.get();

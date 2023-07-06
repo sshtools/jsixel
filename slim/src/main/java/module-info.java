@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 import com.sshtools.jsixel.slim.SlimCodec;
 
 module com.sshtools.jsixel.slim {
 	exports com.sshtools.jsixel.slim;
 	requires transitive com.sshtools.jsixel.lib;
-	provides BitmapCodec with SlimCodec;
+	provides BitmapLoader with SlimCodec;
 }

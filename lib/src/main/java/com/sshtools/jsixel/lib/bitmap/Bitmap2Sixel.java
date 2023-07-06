@@ -12,7 +12,6 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import com.sshtools.jsixel.lib.LibSixel;
 import com.sshtools.jsixel.lib.LibSixelExtensions;
@@ -33,7 +32,7 @@ public final class Bitmap2Sixel implements SixelConverter {
 		private Optional<InputStream> stream = Optional.empty();
 		private Optional<Path> path = Optional.empty();
 		private Optional<URL> url = Optional.empty();
-		private Optional<BitmapCodec.ImageType> type = Optional.empty();
+		private Optional<BitmapLoader.ImageType> type = Optional.empty();
 
 		public Bitmap2SixelBuilder fromBitmap(Bitmap bitmap) {
 			this.bitmap = Optional.of(bitmap);
@@ -77,7 +76,7 @@ public final class Bitmap2Sixel implements SixelConverter {
 			return this;
 		}
 
-		public Bitmap2SixelBuilder withType(BitmapCodec.ImageType type) {
+		public Bitmap2SixelBuilder withType(BitmapLoader.ImageType type) {
 			this.type = Optional.of(type);
 			return this;
 		}
@@ -146,12 +145,12 @@ public final class Bitmap2Sixel implements SixelConverter {
 			if (stream == null) {
 				if (builder.path.isPresent()) {
 					try (var in = Files.newInputStream(builder.path.get())) {
-						bitmap = getCodec().load(builder.type, in);
+						bitmap = SixelConverter.defaultCodec().load(builder.type, in);
 					}
 				} else {
 					if (builder.url.isPresent()) {
 						try (var in = builder.url.get().openStream()) {
-							bitmap = getCodec().load(builder.type, in);
+							bitmap = SixelConverter.defaultCodec().load(builder.type, in);
 						}
 					} else {
 						throw new IllegalStateException(
@@ -159,7 +158,7 @@ public final class Bitmap2Sixel implements SixelConverter {
 					}
 				}
 			} else {
-				bitmap = getCodec().load(builder.type, stream);
+				bitmap = SixelConverter.defaultCodec().load(builder.type, stream);
 			}
 		}
 
@@ -172,12 +171,6 @@ public final class Bitmap2Sixel implements SixelConverter {
 		quality = builder.quality;
 		builtInPalette = builder.builtInPalette;
 		transparent = builder.transparent;
-	}
-
-	private BitmapCodec<?, ?> getCodec() {
-		return ServiceLoader.load(BitmapCodec.class).findFirst()
-				.orElseThrow(() -> new UnsupportedOperationException(
-						"No image codecs installed. Check you have one of the jsixel image codec modules available on the classpath."));
 	}
 
 	@Override

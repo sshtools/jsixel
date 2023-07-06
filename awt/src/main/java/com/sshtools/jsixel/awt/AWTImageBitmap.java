@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -102,8 +103,26 @@ public final class AWTImageBitmap implements Bitmap {
 	private final Optional<byte[]> palette;
 
 	private AWTImageBitmap(BufferedImage image) {
-		this.image = image;
-		format = calcFormat(image.getType(), image.getColorModel().getPixelSize());
+		
+		PixelFormat fmt;
+		BufferedImage img;
+		try {
+			fmt = calcFormat(image.getType(), image.getColorModel().getPixelSize());
+			img = image;
+		}
+		catch(UnsupportedOperationException uoe) {
+			var closest = BufferedImage.TYPE_INT_ARGB;
+			switch(image.getType()) {
+			case BufferedImage.TYPE_USHORT_GRAY:
+				closest = BufferedImage.TYPE_BYTE_GRAY;
+				break;
+			}
+			img = convertTo(image, closest);
+			fmt = calcFormat(closest, img.getColorModel().getPixelSize());
+		}
+		format = fmt;
+		this.image = img;
+		
 		formatType = calcType(image);
 		palette = calcPalette();
 	}
@@ -116,8 +135,9 @@ public final class AWTImageBitmap implements Bitmap {
 	@Override
 	public void write(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
 		var defaultFormat = pixelFormat();
+		var defaultFormatType = formatType();
 		var decodableImage = this.image;
-		if (!Objects.equals(fmt, defaultFormat)) {
+		if (!Objects.equals(fmt, defaultFormat) || !Objects.equals(formatType, defaultFormatType)) {
 			decodableImage = convertTo(decodableImage, calcType(fmt, formatType));
 		}
 
@@ -210,6 +230,12 @@ public final class AWTImageBitmap implements Bitmap {
 			}
 		case BufferedImage.TYPE_BYTE_GRAY:
 			switch (bpp) {
+			case 1:
+				return PixelFormat.G1;
+			case 2:
+				return PixelFormat.G2;
+			case 4:
+				return PixelFormat.G4;
 			case 8:
 				return PixelFormat.G8;
 			default:
@@ -223,7 +249,7 @@ public final class AWTImageBitmap implements Bitmap {
 		case BufferedImage.TYPE_INT_RGB:
 			return PixelFormat.RGBA8888;
 		default:
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException(MessageFormat.format("BufferedImage type {0} ({1} bpp) not supported.", type, bpp));
 		}
 	}
 
@@ -242,7 +268,7 @@ public final class AWTImageBitmap implements Bitmap {
 			return FormatType.PALETTE;
 		} else {
 			var space = colorModel.getColorSpace();
-			if (space.getType() == ColorSpace.CS_GRAY)
+			if (space.getType() == ColorSpace.TYPE_GRAY)
 				return FormatType.GRAYSCALE;
 			return FormatType.COLOR;
 		}

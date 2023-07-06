@@ -10,8 +10,15 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ServiceLoader;
 
 public interface SixelConverter {
+
+	public static BitmapLoader<?, ?> defaultCodec() {
+		return ServiceLoader.load(BitmapLoader.class).findFirst()
+				.orElseThrow(() -> new UnsupportedOperationException(
+						"No image codecs installed. Check you have one of the jsixel image codec modules available on the classpath."));
+	}
 
 	default byte[] toByteArray() {
 		try (var out = new ByteArrayOutputStream()) {

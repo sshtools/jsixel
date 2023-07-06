@@ -6,7 +6,7 @@ import java.nio.channels.Channels;
 import java.util.Optional;
 
 import com.sshtools.jsixel.lib.bitmap.Bitmap;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec.ImageType;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader.ImageType;
 import com.sshtools.jsixel.lib.util.ByteBufferBackedInputStream;
 
 public interface SlimBitmap extends Bitmap {

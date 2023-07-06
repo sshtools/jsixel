@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import com.sshtools.jsixel.javafx.JavaFXImageCodec;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.javafx.JavaFXImageLoader;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 
 module com.sshtools.jsixel.javafx {
 	exports com.sshtools.jsixel.javafx;
 	requires transitive com.sshtools.jsixel.lib;
 	requires transitive javafx.graphics;
-	provides BitmapCodec with JavaFXImageCodec;
+	provides BitmapLoader with JavaFXImageLoader;
 }

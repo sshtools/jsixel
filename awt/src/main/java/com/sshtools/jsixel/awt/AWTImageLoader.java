@@ -8,9 +8,9 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import com.sshtools.jsixel.awt.AWTImageBitmap.BufferedImageBitmapBuilder;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 
-public class AWTImageCodec implements BitmapCodec<AWTImageBitmap, BufferedImageBitmapBuilder> {
+public class AWTImageLoader implements BitmapLoader<AWTImageBitmap, BufferedImageBitmapBuilder> {
  
 	@Override
 	public AWTImageBitmap load(Optional<ImageType>  typeHint, InputStream input) throws IOException {

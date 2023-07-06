@@ -6,9 +6,9 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 import com.sshtools.jsixel.javafx.JavaFXImageBitmap.JavaFXImageBitmapBuilder;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 
-public class JavaFXImageCodec implements BitmapCodec<JavaFXImageBitmap, JavaFXImageBitmapBuilder> {
+public class JavaFXImageLoader implements BitmapLoader<JavaFXImageBitmap, JavaFXImageBitmapBuilder> {
  
 	@Override
 	public JavaFXImageBitmap load(Optional<ImageType>  typeHint, InputStream input) throws IOException {

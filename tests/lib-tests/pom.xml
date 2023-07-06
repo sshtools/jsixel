@@ -10,6 +10,12 @@
 	</parent>
 	<artifactId>jsixel-lib-tests</artifactId>
 	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jsixel-lib</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

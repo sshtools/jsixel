@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
 
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 import com.sshtools.jsixel.slim.SlimBitmap.SlimBitmapBuilder;
 
-public class SlimCodec implements BitmapCodec<SlimBitmap, SlimBitmapBuilder> {
+public class SlimCodec implements BitmapLoader<SlimBitmap, SlimBitmapBuilder> {
 
 	@Override
 	public SlimBitmap load(Optional<ImageType> typeHint, InputStream input) throws IOException {

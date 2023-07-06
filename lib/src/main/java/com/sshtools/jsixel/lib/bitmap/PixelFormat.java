@@ -8,6 +8,10 @@ public enum PixelFormat {
 
 	public int code() {
 		switch(this) {
+		case AG88:
+			return LibSixel.SIXEL_PIXELFORMAT_AG88;
+		case GA88:
+			return LibSixel.SIXEL_PIXELFORMAT_GA88;
 		case RGB555:
 			return LibSixel.SIXEL_PIXELFORMAT_RGB555;
 		case RGB565:

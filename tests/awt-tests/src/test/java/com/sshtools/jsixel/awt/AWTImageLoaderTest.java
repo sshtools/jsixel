@@ -1,4 +1,4 @@
-package com.sshtools.jsixel.swt;
+package com.sshtools.jsixel.awt;
 
 import static org.junit.Assert.assertTrue;
 
@@ -7,25 +7,27 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import com.sshtools.jsixel.awt.AWTImageBitmap.BufferedImageBitmapBuilder;
 import com.sshtools.jsixel.lib.TestUtils;
 import com.sshtools.jsixel.lib.bitmap.Bitmap2Sixel.Bitmap2SixelBuilder;
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec.ImageType;
-import com.sshtools.jsixel.lib.bitmap.Sixel2Bitmap.Sixel2BitmapBuilder;
-import com.sshtools.jsixel.swtimage.SWTImageBitmap.SWTImageBitmapBuilder;
-import com.sshtools.jsixel.swtimage.SWTImageCodec; 
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader.ImageType;
+import com.sshtools.jsixel.lib.bitmap.Sixel2Bitmap.Sixel2BitmapBuilder; 
 
-public class SWTImageCodecTest {
+public class AWTImageLoaderTest {
 
 	@Test
 	public void testLoad() throws Exception {
-		var codec = new SWTImageCodec();
+		var codec = new AWTImageLoader();
 		var tmp = Files.createTempFile("jsixel",".sixel");
-		try (var in = SWTImageCodecTest.class.getResourceAsStream("/test.png")) {
+		try (var in = AWTImageLoaderTest.class.getResourceAsStream("/test.png")) {
 			var bitmap = codec.load(Optional.of(ImageType.PNG), in);
-			var enc = new Bitmap2SixelBuilder().fromBitmap(bitmap).build();
+			var enc = new Bitmap2SixelBuilder().
+					fromBitmap(bitmap).
+					build();
 			enc.write(tmp);
 		}
-		try (var in = SWTImageCodecTest.class.getResourceAsStream("/test.sixel")) {
+		
+		try (var in = AWTImageLoaderTest.class.getResourceAsStream("/test.png.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));
 			}
@@ -34,16 +36,16 @@ public class SWTImageCodecTest {
 	
 	@Test
 	public void testSave() throws Exception {
-		var codec = new SWTImageCodec();
+		var codec = new AWTImageLoader();
 		var enc = new Sixel2BitmapBuilder().
-				fromURL(SWTImageCodecTest.class.getResource("/test.sixel")).
+				fromURL(AWTImageLoaderTest.class.getResource("/test.png.sixel")).
 				// TODO very weird ... doesnt work. But it is effectively the same as the above fromURL()!
 				// fromResource("test.sixel", BufferedImageCodecTest.class). 
 				build();
 		var bitmap = enc.bitmap();
 		var tmp = Files.createTempFile("jsixel",".png");
 		try(var out = Files.newOutputStream(tmp)) {
-			var img = new SWTImageBitmapBuilder().
+			var img = new BufferedImageBitmapBuilder().
 					fromBitmap(bitmap).
 					build();
 			codec.save(ImageType.PNG, img, out);	

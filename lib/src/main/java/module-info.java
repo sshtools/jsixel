@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.sshtools.jsixel.lib.bitmap.BitmapCodec;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 
 open module com.sshtools.jsixel.lib {
 	exports com.sshtools.jsixel.lib.bitmap;
@@ -22,6 +22,6 @@ open module com.sshtools.jsixel.lib {
 	exports com.sshtools.jsixel.lib;
 	requires transitive com.sun.jna; 
 	
-	uses BitmapCodec;
+	uses BitmapLoader;
 
 }
