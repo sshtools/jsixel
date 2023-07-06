@@ -123,7 +123,7 @@
 					<configuration>
 						<encoding>UTF-8</encoding>
 						<detectJavaApiLink>false</detectJavaApiLink>
-						<source>17</source>
+						<source>11</source>
 						<doclint>none</doclint>
 						<sourcepath>src/main/java</sourcepath>
 						<includeDependencySources>false</includeDependencySources>

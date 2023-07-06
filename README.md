@@ -52,3 +52,4 @@ The module to pick will depend on the GUI toolkit (if any) you wish to use.
  * Graal compatibility.
  * Animation support.
  * More pre-built libraries for different platforms and architectures.
+ * Use newer fork of libsixel.

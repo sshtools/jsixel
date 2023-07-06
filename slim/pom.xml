@@ -14,12 +14,5 @@
 			<artifactId>jsixel-lib</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
-			<artifactId>jsixel-lib</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 </project>
