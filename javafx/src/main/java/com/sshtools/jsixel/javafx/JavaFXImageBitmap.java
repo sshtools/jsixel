@@ -52,7 +52,7 @@ public final class JavaFXImageBitmap implements Bitmap {
 						if(bm.formatType() == FormatType.PALETTE) {
 							switch(t) {
 							case BYTE_INDEXED:
-								wimg.getPixelWriter().setPixels(0, 0, bm.width(), bm.height(), indexedPixelFormat(palette), DataArrays.toByteArray(bm.data()), 0, bm.width());
+								wimg.getPixelWriter().setPixels(0, 0, bm.width(), bm.height(), indexedPixelFormat(palette.or(() -> bm.palette())), DataArrays.toByteArray(bm.data()), 0, bm.width());								
 								break;
 							default:
 								throw new UnsupportedOperationException();
@@ -257,8 +257,12 @@ public final class JavaFXImageBitmap implements Bitmap {
 		return javafx.scene.image.PixelFormat.createByteIndexedInstance(rgbPaletteToRgbaPalette(palette.orElseThrow(() -> new IllegalStateException("Palette must be supplied."))));
 	}
 
-	private static int[] rgbPaletteToRgbaPalette(byte[] d) {
-		throw new UnsupportedOperationException();
+	private static int[] rgbPaletteToRgbaPalette(byte[] pal) {
+		var rgbaPal = new int[pal.length / 3];
+		for(int i = 0 ; i < pal.length; i += 3) {
+			rgbaPal[i / 3] = pal[i] << 24 | pal [i + 1] << 16 | pal[i+ 2] << 8;
+		}
+		return rgbaPal;
 	}
 
 }

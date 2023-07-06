@@ -6,8 +6,24 @@
 		<groupId>com.sshtools</groupId>
 		<artifactId>jsixel-tests</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>jsixel-lib-tests</artifactId>
 	<dependencies>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import com.sshtools.jsixel.lib.TestUtils;
 import com.sshtools.jsixel.lib.bitmap.Bitmap2Sixel.Bitmap2SixelBuilder;
 import com.sshtools.jsixel.lib.bitmap.BitmapCodec.ImageType;
-import com.sshtools.jsixel.lib.TestUtils;
 
 public class SlimCodecTest {
 
@@ -24,6 +24,7 @@ public class SlimCodecTest {
 					build();
 			enc.write(tmp);
 		}
+		
 		try (var in = SlimCodecTest.class.getResourceAsStream("/test.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));

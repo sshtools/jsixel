@@ -32,8 +32,13 @@ public final class HexDumpUtil {
 				int asciiWidth = Math.min(width, array.length - rowOffset);
 				builder.append("  |  ");
 				try {
-					builder.append(new String(array, rowOffset, asciiWidth, "UTF-8").replaceAll("\r\n", " ")
-							.replaceAll("\n", " "));
+					var s = new String(array, rowOffset, asciiWidth, "UTF-8");
+					for(var c : s.toCharArray()) {
+						if(c < 32 || ( c > 127 && c < 160 ))  
+							builder.append('.');
+						else
+							builder.append(c);
+					}
 				} catch (UnsupportedEncodingException ignored) {
 					// If UTF-8 isn't available as an encoding then what can we do?!
 				}

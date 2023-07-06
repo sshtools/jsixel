@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.sshtools.jsixel.awt.AWTImageBitmap.BufferedImageBitmapBuilder;
 import com.sshtools.jsixel.lib.TestUtils;
-import com.sshtools.jsixel.lib.bitmap.BuiltInPalette;
 import com.sshtools.jsixel.lib.bitmap.Bitmap2Sixel.Bitmap2SixelBuilder;
 import com.sshtools.jsixel.lib.bitmap.BitmapCodec.ImageType;
 import com.sshtools.jsixel.lib.bitmap.Sixel2Bitmap.Sixel2BitmapBuilder; 
@@ -24,10 +23,10 @@ public class AWTImageCodecTest {
 			var bitmap = codec.load(Optional.of(ImageType.PNG), in);
 			var enc = new Bitmap2SixelBuilder().
 					fromBitmap(bitmap).
-					withPalette(BuiltInPalette.G8).
 					build();
 			enc.write(tmp);
 		}
+		
 		try (var in = AWTImageCodecTest.class.getResourceAsStream("/test.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));

@@ -6,6 +6,7 @@
 		<groupId>com.sshtools</groupId>
 		<artifactId>jsixel-tests</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>jsixel-javafx-tests</artifactId>
 	<dependencies>

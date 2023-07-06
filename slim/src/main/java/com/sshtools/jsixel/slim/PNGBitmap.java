@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import com.sshtools.jsixel.lib.bitmap.FormatType;
 import com.sshtools.jsixel.lib.bitmap.PixelFormat;
+import com.sshtools.jsixel.slim.PNGDecoder.Format;
 
 /**
  *
@@ -45,18 +46,16 @@ import com.sshtools.jsixel.lib.bitmap.PixelFormat;
 public class PNGBitmap implements SlimBitmap {
     
     private PNGDecoder decoder;
-    private PNGDecoder.Format pngFormat;
     
     PNGBitmap(InputStream inputStream) throws IOException {
     	
         decoder = new PNGDecoder(inputStream);
-        //best way I can see that returns the GL-capable format
-        pngFormat = decoder.decideTextureFormat(PNGDecoder.Format.LUMINANCE_ALPHA);
     }
 
 	@Override
 	public void write(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
         try {
+        	var pngFormat = decideFormat(pixelFormat, formatType);
 			decoder.decode(buffer, width()*pngFormat.getNumComponents(), pngFormat);
 			buffer.flip();
 		} catch (IOException e) {
@@ -111,9 +110,9 @@ public class PNGBitmap implements SlimBitmap {
 	public PixelFormat pixelFormat() {
         switch (decoder.colorType) {
         case PNGDecoder.COLOR_TRUECOLOR:
-            return PixelFormat.RGB888;
+            return PixelFormat.RGBA8888;
         case PNGDecoder.COLOR_TRUEALPHA:
-            return PixelFormat.ARGB8888;
+            return PixelFormat.RGBA8888;
         case PNGDecoder.COLOR_GREYSCALE:
             return PixelFormat.G8;
         case PNGDecoder.COLOR_GREYALPHA:
@@ -128,5 +127,27 @@ public class PNGBitmap implements SlimBitmap {
 	@Override
 	public Optional<byte[]> palette() {
 		return Optional.ofNullable(decoder.palette);
+	}
+
+	private Format decideFormat(PixelFormat pixelFormat, FormatType formatType) {
+		switch(formatType) {
+		case COLOR:
+			switch(pixelFormat) {
+			case ABGR8888:
+				return Format.ABGR;
+			case BGRA8888:
+				return Format.BGRA;
+			case RGBA8888:
+				return Format.RGBA;
+			case RGB888:
+				return Format.RGB;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+		throw new UnsupportedOperationException(pixelFormat + " / " + formatType);
 	}
 }
