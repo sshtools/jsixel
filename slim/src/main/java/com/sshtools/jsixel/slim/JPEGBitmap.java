@@ -11,9 +11,9 @@ import com.sshtools.jsixel.lib.bitmap.PixelFormat;
 
 public class JPEGBitmap implements SlimBitmap {
 
-	private JPEGDecoder decoder;
-	private int width;
-	private int height;
+	private final JPEGDecoder decoder;
+	private final int width;
+	private final int height;
 
 	JPEGBitmap(InputStream in) throws IOException {
 		decoder = new JPEGDecoder(in);
@@ -25,12 +25,14 @@ public class JPEGBitmap implements SlimBitmap {
 	}
 
 	@Override
-	public void write(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
 		try {
 			decoder.decodeRGB(buffer, width * 4, decoder.getNumMCURows());
+			buffer.flip();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		return false;
 	}
 
 	@Override
@@ -61,5 +63,11 @@ public class JPEGBitmap implements SlimBitmap {
 	@Override
 	public Optional<byte[]> palette() {
 		return Optional.empty();
+	}
+
+	@Override
+	public String toString() {
+		return "JPEGBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + "]";
 	}
 }

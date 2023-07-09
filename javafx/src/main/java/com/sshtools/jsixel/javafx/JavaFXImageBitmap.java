@@ -106,18 +106,18 @@ public final class JavaFXImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public void write(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
 		var defaultFormat = pixelFormat();
 		if (!Objects.equals(fmt, defaultFormat)) {
 			throw new UnsupportedOperationException("Conversion not supported.");
 		}
-		// TODO write image data to buffer
 		
 		if(formatType == FormatType.PALETTE) {
 			switch(image.getPixelReader().getPixelFormat().getType()) {
 //			case BYTE_INDEXED:
 //				var arr = new byte[width() * height()];
-//				image.getPixelReader().getPixels(0, 0, width(), height(), indexedPixelFormat(Optional.of(palette())), arr, 0, width());
+//				var fmt = indexedPixelFormat(Optional.of(palette()));
+//				image.getPixelReader().getPixels(0, 0, width(), height(), pfmt, arr, 0, width());
 //				break;
 			default:
 				throw new UnsupportedOperationException();
@@ -127,7 +127,8 @@ public final class JavaFXImageBitmap implements Bitmap {
 			throw new UnsupportedOperationException();
 		}
 		else {
-			switch(image.getPixelReader().getPixelFormat().getType()) {
+			var type = image.getPixelReader().getPixelFormat().getType();
+			switch(type) {
 			case BYTE_BGRA: {
 				var arr = new byte[width() * height() * 4];
 				image.getPixelReader().getPixels(0, 0, width(), height(), WritablePixelFormat.getByteBgraInstance(), arr, 0, width() * 4);
@@ -152,13 +153,24 @@ public final class JavaFXImageBitmap implements Bitmap {
 				buffer.asIntBuffer().put(arr);
 				break;
 			}
+			case BYTE_RGB:
+				var arr = new byte[width() * height() * 4];
+				image.getPixelReader().getPixels(0, 0, width(), height(), WritablePixelFormat.getByteBgraInstance(), arr, 0, width() * 4);
+				for(int i = 0 ; i < arr.length ; i += 4) {
+					buffer.put(arr[i + 2]);
+					buffer.put(arr[i + 1]);
+					buffer.put(arr[i]);
+				}
+				break;
+			case BYTE_INDEXED:
 			default:
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException(type.name());
 			}
 		}
 		
 
 		buffer.flip();
+		return false;
 	}
 
 	@Override
@@ -265,4 +277,9 @@ public final class JavaFXImageBitmap implements Bitmap {
 		return rgbaPal;
 	}
 
+	@Override
+	public String toString() {
+		return "JavaFXImageBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + "]";
+	}
 }

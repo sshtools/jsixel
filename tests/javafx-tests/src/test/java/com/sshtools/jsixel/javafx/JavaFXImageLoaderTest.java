@@ -23,7 +23,7 @@ public class JavaFXImageLoaderTest {
 			enc.write(tmp);
 		}
 		
-		try (var in = JavaFXImageLoaderTest.class.getResourceAsStream("/test.png.sixel")) {
+		try (var in = JavaFXImageLoaderTest.class.getResourceAsStream("/results/test.png.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));
 			}

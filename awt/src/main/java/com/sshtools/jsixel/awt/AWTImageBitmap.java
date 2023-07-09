@@ -128,12 +128,7 @@ public final class AWTImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public int bitsPerPixel() {
-		return image.getColorModel().getPixelSize();
-	}
-
-	@Override
-	public void write(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
 		var defaultFormat = pixelFormat();
 		var defaultFormatType = formatType();
 		var decodableImage = this.image;
@@ -154,6 +149,7 @@ public final class AWTImageBitmap implements Bitmap {
 			throw new IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.getClass());
 		}
 		buffer.flip();
+		return false;
 	}
 
 	@Override
@@ -330,6 +326,12 @@ public final class AWTImageBitmap implements Bitmap {
 			img = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), type);
 		img.getGraphics().drawImage(sourceImage, 0, 0, null);
 		return img;
+	}
+
+	@Override
+	public String toString() {
+		return "AWTImageBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + "]";
 	}
 
 }

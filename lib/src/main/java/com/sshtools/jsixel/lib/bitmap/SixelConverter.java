@@ -43,19 +43,19 @@ public interface SixelConverter {
 
 	default void write(Path file) throws IOException {
 		try(var out = Files.newOutputStream(file)) {
-			write(out);
+			while(write(out));
 		}
 	}
 
-	default void write(OutputStream out) {
-		write(Channels.newChannel(out));
+	default boolean write(OutputStream out) {
+		return write(Channels.newChannel(out));
 	}
 	
 	Bitmap bitmap();
 
-	void write(WritableByteChannel writable);
+	boolean write(WritableByteChannel writable);
 
-	default void write(StringBuilder stringBuffer) {
+	default boolean write(StringBuilder stringBuffer) {
 		throw new UnsupportedOperationException();
 	}
 }

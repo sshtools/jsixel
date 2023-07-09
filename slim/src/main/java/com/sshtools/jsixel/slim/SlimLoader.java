@@ -8,7 +8,7 @@ import java.util.Optional;
 import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
 import com.sshtools.jsixel.slim.SlimBitmap.SlimBitmapBuilder;
 
-public class SlimCodec implements BitmapLoader<SlimBitmap, SlimBitmapBuilder> {
+public class SlimLoader implements BitmapLoader<SlimBitmap, SlimBitmapBuilder> {
 
 	@Override
 	public SlimBitmap load(Optional<ImageType> typeHint, InputStream input) throws IOException {

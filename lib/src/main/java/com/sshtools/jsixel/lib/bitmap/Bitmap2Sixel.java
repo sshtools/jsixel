@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import com.sshtools.jsixel.lib.LibSixel;
 import com.sshtools.jsixel.lib.LibSixelExtensions;
+import com.sshtools.jsixel.lib.bitmap.BitmapLoader.ImageType;
 import com.sun.jna.ptr.PointerByReference;
 
 public final class Bitmap2Sixel implements SixelConverter {
@@ -127,7 +128,7 @@ public final class Bitmap2Sixel implements SixelConverter {
 	}
 
 	private final Bitmap bitmap;
-	private final ByteBuffer data;
+//	private final ByteBuffer data;
 	private final int colors;
 	private final Optional<Diffuse> diffuse;
 	private final Optional<Boolean> optimizePalette;
@@ -144,13 +145,15 @@ public final class Bitmap2Sixel implements SixelConverter {
 			var stream = builder.stream.orElse(null);
 			if (stream == null) {
 				if (builder.path.isPresent()) {
+					var p = builder.path.get();
 					try (var in = Files.newInputStream(builder.path.get())) {
-						bitmap = SixelConverter.defaultCodec().load(builder.type, in);
+						bitmap = SixelConverter.defaultCodec().load(builder.type.or(() -> calcType(p.getFileName().toString())), in);
 					}
 				} else {
 					if (builder.url.isPresent()) {
-						try (var in = builder.url.get().openStream()) {
-							bitmap = SixelConverter.defaultCodec().load(builder.type, in);
+						var u = builder.url.get();
+						try (var in = u.openStream()) {
+							bitmap = SixelConverter.defaultCodec().load(builder.type.or(() -> calcType(u.toString())), in);
 						}
 					} else {
 						throw new IllegalStateException(
@@ -162,7 +165,7 @@ public final class Bitmap2Sixel implements SixelConverter {
 			}
 		}
 
-		data = bitmap.data();
+//		data = bitmap.data();
 		colors = builder.colors.orElse(255);
 		diffuse = builder.diffuse;
 		palette = builder.palette.or(() -> bitmap.palette());
@@ -172,9 +175,23 @@ public final class Bitmap2Sixel implements SixelConverter {
 		builtInPalette = builder.builtInPalette;
 		transparent = builder.transparent;
 	}
+	
+	private Optional<ImageType> calcType(String name) {
+		name = name.toLowerCase();
+		if(name.endsWith(".png"))
+			return Optional.of(ImageType.PNG);
+		else if(name.endsWith(".gif"))
+			return Optional.of(ImageType.GIF);
+		else if(name.endsWith(".jpeg") || name.endsWith(".jpg"))
+			return Optional.of(ImageType.JPEG);
+		else if(name.endsWith(".bmp"))
+			return Optional.of(ImageType.BMP);
+		else
+			return Optional.empty();
+	}
 
 	@Override
-	public void write(WritableByteChannel writable) {
+	public boolean write(WritableByteChannel writable) {
 
 		var output = LibSixel.INSTANCE.sixel_output_create((data, size, priv) -> {
 			var buffer = data.getByteBuffer(0, size);
@@ -186,11 +203,11 @@ public final class Bitmap2Sixel implements SixelConverter {
 			return 0;
 		}, null);
 
-		doOutput(output);
+		return doOutput(output);
 	}
 
 	@Override
-	public void write(StringBuilder stringBuffer) {
+	public boolean write(StringBuilder stringBuffer) {
 
 		var output = LibSixel.INSTANCE.sixel_output_create((data, size, priv) -> {
 			var buffer = data.getByteArray(0, size);
@@ -202,10 +219,10 @@ public final class Bitmap2Sixel implements SixelConverter {
 			return 0;
 		}, null);
 
-		doOutput(output);
+		return doOutput(output);
 	}
 	
-	private PointerByReference createDither() {
+	private PointerByReference createDither(ByteBuffer data) {
 		if (builtInPalette.isPresent())
 			return LibSixel.INSTANCE.sixel_dither_get(builtInPalette.get().code());
 		else {
@@ -230,9 +247,10 @@ public final class Bitmap2Sixel implements SixelConverter {
 		}
 	}
 
-	private void doOutput(PointerByReference output) {
+	private boolean doOutput(PointerByReference output) {
 		try {
-			PointerByReference dither = createDither();
+			var data = bitmap.data();
+			PointerByReference dither = createDither(data);
 			try {
 				LibSixel.INSTANCE.sixel_dither_set_pixelformat(dither, bitmap.pixelFormat().code());
 				
@@ -257,6 +275,8 @@ public final class Bitmap2Sixel implements SixelConverter {
 				}
 
 				LibSixelExtensions.throwIfFailed(LibSixel.INSTANCE.sixel_encode(data, bitmap.width(), bitmap.height(), bitmap.bitsPerPixel(), dither, output));
+				
+				return bitmap.hasMoreFrames();
 			} finally {
 				if (dither != null)
 					LibSixel.INSTANCE.sixel_dither_unref(dither);

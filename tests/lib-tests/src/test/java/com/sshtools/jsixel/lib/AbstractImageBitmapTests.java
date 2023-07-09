@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.util.function.Consumer;
 
 import com.sshtools.jsixel.lib.bitmap.Bitmap2Sixel.Bitmap2SixelBuilder;
+import com.sshtools.jsixel.lib.bitmap.Sixel2Bitmap.Sixel2BitmapBuilder;
+import com.sshtools.jsixel.lib.util.HexDumpUtil;
 
 public class AbstractImageBitmapTests {
 
@@ -19,6 +21,7 @@ public class AbstractImageBitmapTests {
 		if (builderConfigure != null)
 			builderConfigure.accept(bldr);
 		var enc = bldr.build();
+		System.out.println(imageResource + " = " + enc.bitmap());
 		var tmp = Files.createTempFile("jsixel", ".sixel");
 		enc.write(tmp);
 		try (var in = AbstractImageBitmapTests.class.getResourceAsStream(sixelResource)) {
@@ -27,5 +30,4 @@ public class AbstractImageBitmapTests {
 			}
 		}
 	}
-
 }

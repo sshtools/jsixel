@@ -168,8 +168,8 @@ public final class Sixel2Bitmap implements SixelConverter {
 	}
 
 	@Override
-	public void write(WritableByteChannel writable) {
-		bitmap.write(writable);
+	public boolean write(WritableByteChannel writable) {
+		return bitmap.frame(writable);
 	}
 
 	@Override

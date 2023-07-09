@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 
 import com.sshtools.jsixel.awt.AWTImageBitmap.BufferedImageBitmapBuilder;
 import com.sshtools.jsixel.lib.bitmap.BitmapLoader;

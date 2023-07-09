@@ -1,4 +1,4 @@
-package com.sshtools.jsixel.swtimage;
+package com.sshtools.jsixel.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,9 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
 import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
-import com.sshtools.jsixel.swtimage.SWTImageBitmap.SWTImageBitmapBuilder;
+import com.sshtools.jsixel.swt.SWTImageBitmap.SWTImageBitmapBuilder;
 
-public class SWTImageCodec implements BitmapLoader<SWTImageBitmap, SWTImageBitmapBuilder> {
+public class SWTImageLoader implements BitmapLoader<SWTImageBitmap, SWTImageBitmapBuilder> {
 
 	@Override
 	public SWTImageBitmap load(Optional<ImageType> typeHint, InputStream input) throws IOException {

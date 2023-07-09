@@ -14,14 +14,15 @@ import com.sshtools.jsixel.lib.util.DataArrays;
 public interface Bitmap {
 
 	@SuppressWarnings("unchecked")
-	public abstract static class BitmapBuilder<BUILDER extends BitmapBuilder<BUILDER, BITMAP>, BITMAP>  {
-		protected  Optional<ByteBuffer> data = Optional.empty();
-		protected  Optional<ReadableByteChannel> readable = Optional.empty();
-		protected  Optional<byte[]> palette = Optional.empty();
-		
-		protected  Optional<Integer> bitsPerPixel = Optional.empty();
-		protected  Optional<Integer> width = Optional.empty();
-		protected  Optional<Integer> height = Optional.empty();
+	public abstract static class BitmapBuilder<BUILDER extends BitmapBuilder<BUILDER, BITMAP>, BITMAP> {
+		protected Optional<ByteBuffer> data = Optional.empty();
+		protected Optional<ReadableByteChannel> readable = Optional.empty();
+		protected Optional<byte[]> palette = Optional.empty();
+
+		protected Optional<Integer> bitsPerPixel = Optional.empty();
+		protected Optional<Integer> width = Optional.empty();
+		protected Optional<Integer> height = Optional.empty();
+		protected Optional<String> filenameHint = Optional.empty();
 
 		public BUILDER withWidth(int width) {
 			this.width = Optional.of(width);
@@ -60,7 +61,7 @@ public interface Bitmap {
 			this.readable = Optional.of(readable);
 			return (BUILDER) this;
 		}
-		
+
 		public abstract BITMAP build();
 	}
 
@@ -68,30 +69,31 @@ public interface Bitmap {
 		return DataArrays.toByteArray(data());
 	}
 
-    default ByteBuffer data() {
-    	var buf = ByteBuffer.allocate(dataByteSize());
-    	write(buf, pixelFormat(), formatType());
-    	return buf;
-    }
+	default ByteBuffer data() {
+		var buf = ByteBuffer.allocate(dataByteSize());
+		frame(buf, pixelFormat(), formatType());
+		return buf;
+	}
 
 	default int dataByteSize() {
 		return width() * height() * bytesPerPixel();
 	}
-	
-	default void write(WritableByteChannel channel) {
+
+	default boolean frame(WritableByteChannel channel) {
 		try {
 			channel.write(data());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		return false;
 	}
 
-    default void write(ByteBuffer buffer) {
-    	write(buffer, pixelFormat(), formatType());
-    }
+	default boolean frame(ByteBuffer buffer) {
+		return frame(buffer, pixelFormat(), formatType());
+	}
 
-    void write(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType);
-    
+	boolean frame(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType);
+
 	FormatType formatType();
 
 	int width();
@@ -102,9 +104,15 @@ public interface Bitmap {
 		return bitsPerPixel() / 8;
 	}
 
-	int bitsPerPixel();
+	default int bitsPerPixel() {
+		return pixelFormat().bpp();
+	}
 
 	PixelFormat pixelFormat();
 
 	Optional<byte[]> palette();
+
+	default boolean hasMoreFrames() {
+		return false;
+	}
 }

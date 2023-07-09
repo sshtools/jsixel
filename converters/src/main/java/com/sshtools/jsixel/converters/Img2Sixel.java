@@ -66,7 +66,7 @@ public class Img2Sixel implements Callable<Integer> {
 	@Option(names = { "-7", "--7bit-mode" }, description = "generate a sixel image for 7 bit terminals or printers")
 	private boolean sevenBitMode;
 
-	@Option(names = { "-8", "--8bit-mode" }, description = "generate a sixel image for 7 bit terminals or printers")
+	@Option(names = { "-8", "--8bit-mode" }, description = "generate a sixel image for 8 bit terminals or printers")
 	private boolean eightBitMode;
 
 	@Option(names = { "-R", "--gri-limit" }, description = "limit arguments of DECGRI('!') to 255")

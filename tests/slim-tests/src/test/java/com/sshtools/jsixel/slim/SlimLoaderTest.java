@@ -15,7 +15,7 @@ public class SlimLoaderTest {
 
 	@Test
 	public void testLoad() throws Exception {
-		var codec = new SlimCodec();
+		var codec = new SlimLoader();
 		var tmp = Files.createTempFile("jsixel",".sixel");
 		try (var in = SlimLoaderTest.class.getResourceAsStream("/test.png")) {
 			var bitmap = codec.load(Optional.of(ImageType.PNG), in);
@@ -25,7 +25,7 @@ public class SlimLoaderTest {
 			enc.write(tmp);
 		}
 		
-		try (var in = SlimLoaderTest.class.getResourceAsStream("/test.png.sixel")) {
+		try (var in = SlimLoaderTest.class.getResourceAsStream("/results/test.png.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));
 			}

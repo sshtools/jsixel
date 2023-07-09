@@ -27,7 +27,7 @@ public class AWTImageLoaderTest {
 			enc.write(tmp);
 		}
 		
-		try (var in = AWTImageLoaderTest.class.getResourceAsStream("/test.png.sixel")) {
+		try (var in = AWTImageLoaderTest.class.getResourceAsStream("/results/test.png.sixel")) {
 			try (var in2 = Files.newInputStream(tmp)) {
 				assertTrue(TestUtils.isEqual(in, in2));
 			}
@@ -38,7 +38,7 @@ public class AWTImageLoaderTest {
 	public void testSave() throws Exception {
 		var codec = new AWTImageLoader();
 		var enc = new Sixel2BitmapBuilder().
-				fromURL(AWTImageLoaderTest.class.getResource("/test.png.sixel")).
+				fromURL(AWTImageLoaderTest.class.getResource("/test.sixel")).
 				// TODO very weird ... doesnt work. But it is effectively the same as the above fromURL()!
 				// fromResource("test.sixel", BufferedImageCodecTest.class). 
 				build();

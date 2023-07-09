@@ -84,6 +84,8 @@ public enum PixelFormat {
 			return 4;
 		case PAL8:
 			return 8;
+		case GA88:
+			return 16;
 		default:
 			throw new UnsupportedOperationException();
 		}

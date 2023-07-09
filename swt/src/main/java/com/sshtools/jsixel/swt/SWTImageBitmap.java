@@ -1,10 +1,11 @@
-package com.sshtools.jsixel.swtimage;
+package com.sshtools.jsixel.swt;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.swt.graphics.ImageData;
@@ -19,18 +20,46 @@ import com.sshtools.jsixel.lib.util.DataArrays;
 
 public final class SWTImageBitmap implements Bitmap {
 
-	private final static Map<PixelFormat, PaletteData> paletteData = new HashMap<>();
+	private final static Map<FormatKey, PaletteData> paletteData = new HashMap<>();
+	
+	static final class FormatKey {
+		final PixelFormat pixelFormat;
+		final int depth;
+		
+		FormatKey(PixelFormat pixelFormat, int depth) {
+			this.pixelFormat = pixelFormat;
+			this.depth = depth;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(depth, pixelFormat);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			FormatKey other = (FormatKey) obj;
+			return depth == other.depth && Objects.equals(pixelFormat, other.pixelFormat);
+		}
+		
+	}
 	
 	static {
-		paletteData.put(PixelFormat.ABGR8888, new PaletteData(0x000000ff, 0x0000ff00, 0x00ff0000));
-		paletteData.put(PixelFormat.BGR888, new PaletteData(0x000000ff, 0x0000ff00, 0x00ff0000));
-		paletteData.put(PixelFormat.ARGB8888, new PaletteData(0x00ff0000, 0x0000ff00, 0x000000ff));
-		paletteData.put(PixelFormat.RGB888, new PaletteData(0xff000000, 0x00ff0000, 0x0000ff00));
-		paletteData.put(PixelFormat.RGB555, new PaletteData(0x00007c00, 0x000003e0, 0x0000001f));
-		paletteData.put(PixelFormat.RGB565, new PaletteData(0x0001f800, 0x000007e0, 0x0000001f));
-		paletteData.put(PixelFormat.BGR555, new PaletteData(0x0000001f, 0x000003e0, 0x00007c00));
-		paletteData.put(PixelFormat.BGR565, new PaletteData(0x0000001f, 0x000007e0, 0x0001f800));
-		paletteData.put(PixelFormat.BGRA8888, new PaletteData(0x0000ff00, 0x00ff0000, 0xff000000));
+		paletteData.put(new FormatKey(PixelFormat.ABGR8888, 32), new PaletteData(0x000000ff, 0x0000ff00, 0x00ff0000));
+		paletteData.put(new FormatKey(PixelFormat.RGB888, 24), new PaletteData(0x00ff0000, 0x0000ff00, 0x000000ff));
+		paletteData.put(new FormatKey(PixelFormat.ARGB8888, 32), new PaletteData(0x00ff0000, 0x0000ff00, 0x000000ff));
+		paletteData.put(new FormatKey(PixelFormat.BGR888, 24), new PaletteData(0xff000000, 0x00ff0000, 0x0000ff00));
+		paletteData.put(new FormatKey(PixelFormat.RGB555, 16), new PaletteData(0x00007c00, 0x000003e0, 0x0000001f));
+		paletteData.put(new FormatKey(PixelFormat.RGB565, 16), new PaletteData(0x0001f800, 0x000007e0, 0x0000001f));
+		paletteData.put(new FormatKey(PixelFormat.BGR555, 16), new PaletteData(0x0000001f, 0x000003e0, 0x00007c00));
+		paletteData.put(new FormatKey(PixelFormat.BGR565, 16), new PaletteData(0x0000001f, 0x000007e0, 0x0001f800));
+		paletteData.put(new FormatKey(PixelFormat.BGRA8888, 32), new PaletteData(0x0000ff00, 0x00ff0000, 0xff000000));
 	}
 
 	public final static class SWTImageBitmapBuilder extends BitmapBuilder<SWTImageBitmapBuilder, SWTImageBitmap> {
@@ -72,7 +101,7 @@ public final class SWTImageBitmap implements Bitmap {
 						} else if (bm.formatType() == FormatType.GRAYSCALE) {
 							throw new UnsupportedOperationException();
 						} else {
-							var pd = paletteData.get(bm.pixelFormat());
+							var pd = paletteData.get(new FormatKey(bm.pixelFormat(), bm.bitsPerPixel()));
 							if(pd == null)
 								throw new UnsupportedOperationException();
 								
@@ -106,11 +135,11 @@ public final class SWTImageBitmap implements Bitmap {
 	private PixelFormat calcFormat(ImageData image) {
 		if(image.palette.isDirect) {
 			for(var v : paletteData.entrySet()) {
-				if(paletteDataEquals(image.palette, v.getValue())) {
-					return v.getKey();
+				if(v.getKey().depth == image.depth && paletteDataEquals(image.palette, v.getValue())) {
+					return v.getKey().pixelFormat;
 				}
 			}
-			throw new UnsupportedOperationException("Color depth of " + image.depth + " and palette " + image.palette + " not supported.");
+			throw new UnsupportedOperationException("Color depth of " + image.depth + " and palette " + paletteInfo(image) + " not supported.");
 		}
 		else {
 			if(image.depth == 8) {
@@ -138,7 +167,7 @@ public final class SWTImageBitmap implements Bitmap {
 	}
 
 	@Override
-	public void write(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
 		if (fmt != pixelFormat() || formatType != formatType()) {
 			throw new UnsupportedOperationException("Conversion not supported");
 		}
@@ -146,6 +175,7 @@ public final class SWTImageBitmap implements Bitmap {
 		buffer.put(image.data);
 		
 		buffer.flip();
+		return false;
 	}
 
 	@Override
@@ -205,6 +235,17 @@ public final class SWTImageBitmap implements Bitmap {
 			}
 			return Optional.of(b);
 		}
+	}
+
+	@Override
+	public String toString() {
+		var pd = paletteInfo(image);
+		return "SWTImageBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + ",pd=" + pd + ",transparentPixel=" + image.transparentPixel + ",sourceDpeth" + image.depth + ",type=" + image.type + ",maskPad=" + image.maskPad + "]";
+	}
+
+	private String paletteInfo(ImageData image) {
+		return String.format("%08x %08x %08x", image.palette.redMask,image.palette.greenMask,image.palette.blueMask);
 	}
 
 }

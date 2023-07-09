@@ -83,7 +83,7 @@
 								<phase>package</phase>
 								<configuration>
 									<mainClass>com.sshtools.jsixel.converters.Sixel2Png</mainClass>
-									<imageName>jimg2sixel</imageName>
+									<imageName>jsixel2png</imageName>
 									<buildArgs>--allow-incomplete-classpath --report-unsupported-elements-at-runtime</buildArgs>
 								</configuration>
 							</execution>

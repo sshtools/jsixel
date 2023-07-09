@@ -39,21 +39,16 @@ import com.sshtools.jsixel.lib.bitmap.FormatType;
 import com.sshtools.jsixel.lib.bitmap.PixelFormat;
 import com.sshtools.jsixel.slim.PNGDecoder.Format;
 
-/**
- *
- * @author Matthias Mann
- */
 public class PNGBitmap implements SlimBitmap {
     
-    private PNGDecoder decoder;
+    private final PNGDecoder decoder;
     
-    PNGBitmap(InputStream inputStream) throws IOException {
-    	
-        decoder = new PNGDecoder(inputStream);
+    PNGBitmap(InputStream input) throws IOException {
+        decoder = new PNGDecoder(input);
     }
 
 	@Override
-	public void write(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
         try {
         	var pngFormat = decideFormat(pixelFormat, formatType);
 			decoder.decode(buffer, width()*pngFormat.getNumComponents(), pngFormat);
@@ -61,6 +56,7 @@ public class PNGBitmap implements SlimBitmap {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+        return false;
 	}
 
 	@Override
@@ -91,22 +87,6 @@ public class PNGBitmap implements SlimBitmap {
 	}
 
 	@Override
-	public int bitsPerPixel() {
-    	switch (decoder.colorType) {
-		case PNGDecoder.COLOR_GREYSCALE:
-			return 8;
-		case PNGDecoder.COLOR_TRUECOLOR:
-			return 24;
-		case PNGDecoder.COLOR_TRUEALPHA:
-			return 32;
-		case PNGDecoder.COLOR_INDEXED:
-			return 8;
-		default:
-			throw new IllegalStateException("unsupported color format");
-		}
-	}
-
-	@Override
 	public PixelFormat pixelFormat() {
         switch (decoder.colorType) {
         case PNGDecoder.COLOR_TRUECOLOR:
@@ -114,11 +94,33 @@ public class PNGBitmap implements SlimBitmap {
         case PNGDecoder.COLOR_TRUEALPHA:
             return PixelFormat.RGBA8888;
         case PNGDecoder.COLOR_GREYSCALE:
-            return PixelFormat.G8;
+        	switch(decoder.getBitdepth()) {
+        	case 1:
+                return PixelFormat.G1;
+        	case 2:
+                return PixelFormat.G2;
+        	case 4:
+                return PixelFormat.G4;
+        	case 8:
+                return PixelFormat.G8;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented");
+        	}
         case PNGDecoder.COLOR_GREYALPHA:
-            return PixelFormat.G1;
+            return PixelFormat.GA88;
         case PNGDecoder.COLOR_INDEXED:
-            return PixelFormat.PAL8;
+        	switch(decoder.getBitdepth()) {
+        	case 1:
+                return PixelFormat.PAL1;
+        	case 2:
+                return PixelFormat.PAL2;
+        	case 4:
+                return PixelFormat.PAL4;
+        	case 8:
+                return PixelFormat.PAL8;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented");
+        	}
         default:
             throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -145,9 +147,29 @@ public class PNGBitmap implements SlimBitmap {
 				break;
 			}
 			break;
+		case GRAYSCALE:
+			switch(pixelFormat) {
+			case GA88:
+				return Format.LUMINANCE_ALPHA;
+			case G1:
+			case G2:
+			case G4:
+			case G8:
+				return Format.LUMINANCE;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		case PALETTE:
+			return Format.PAL;
 		default:
 			break;
 		}
 		throw new UnsupportedOperationException(pixelFormat + " / " + formatType);
+	}
+
+	@Override
+	public String toString() {
+		return "PNGBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + "]";
 	}
 }

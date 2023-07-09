@@ -64,13 +64,14 @@ public final class RawBitmap implements Bitmap {
 	}
 
 	@Override
-	public void write(ByteBuffer buffer, PixelFormat fmt, FormatType formatType)  {
+	public boolean frame(ByteBuffer buffer, PixelFormat fmt, FormatType formatType)  {
 		if (fmt != pixelFormat)
 			throw new IllegalArgumentException("Cannot convert format.");
 
 		buffer.put(data);
 		buffer.flip();
 		data.flip();
+		return false;
 	}
 
 	@Override

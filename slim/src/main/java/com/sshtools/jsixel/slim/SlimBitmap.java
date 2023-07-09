@@ -1,6 +1,9 @@
 package com.sshtools.jsixel.slim;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.channels.Channels;
 import java.util.Optional;
@@ -29,20 +32,24 @@ public interface SlimBitmap extends Bitmap {
 		public SlimBitmap build() {
 			try {
 				if (readable.isPresent()) {
-					switch (typeHint.orElseThrow(
-							() -> new IllegalStateException("Type of image must be provided with this codec."))) {
+					switch (typeHint.or(this::guessType).orElseThrow(
+							() -> new IllegalStateException("Type of image must be provided with this codec if it cannot be guessed."))) {
+					case GIF:
+						return new GIFBitmap(readFully(Channels.newInputStream(readable.get())));
 					case BMP:
-						return new BMPBitmap(Channels.newInputStream(readable.get()));
+						return new BMPBitmap(readFully(Channels.newInputStream(readable.get())));
 					case PNG:
-						return new PNGBitmap(Channels.newInputStream(readable.get())); 
+						return new PNGBitmap(readFully(Channels.newInputStream(readable.get()))); 
 					case JPEG:
-						return new JPEGBitmap(Channels.newInputStream(readable.get()));
+						return new JPEGBitmap(readFully(Channels.newInputStream(readable.get())));
 					default:
 						throw new UnsupportedOperationException();
 					}
 				} else if (data.isPresent()) {
-					switch (typeHint.orElseThrow(
-							() -> new IllegalStateException("Type of image must be provided with this codec."))) {
+					switch (typeHint.or(this::guessType).orElseThrow(
+							() -> new IllegalStateException("Type of image must be provided with this codec if it cannot be guessed."))) {
+					case GIF:
+						return new GIFBitmap(new ByteBufferBackedInputStream(data.get()));
 					case PNG:
 						return new PNGBitmap(new ByteBufferBackedInputStream(data.get()));
 					case BMP:
@@ -57,6 +64,16 @@ public interface SlimBitmap extends Bitmap {
 			} catch (IOException ioe) {
 				throw new UncheckedIOException(ioe);
 			}
+		}
+		
+		private InputStream readFully(InputStream in) throws IOException {
+			var out  =new ByteArrayOutputStream();
+			in.transferTo(out);
+			return new ByteArrayInputStream(out.toByteArray());
+		}
+
+		Optional<ImageType> guessType() {
+			return Optional.empty();
 		}
 
 	}

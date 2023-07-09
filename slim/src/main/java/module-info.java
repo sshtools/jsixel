@@ -15,10 +15,11 @@
  */
 
 import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
-import com.sshtools.jsixel.slim.SlimCodec;
+import com.sshtools.jsixel.slim.SlimLoader;
 
 module com.sshtools.jsixel.slim {
 	exports com.sshtools.jsixel.slim;
 	requires transitive com.sshtools.jsixel.lib;
-	provides BitmapLoader with SlimCodec;
+	requires static com.ibasco.gifreader;
+	provides BitmapLoader with SlimLoader;
 }

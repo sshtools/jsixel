@@ -52,7 +52,8 @@ public class PNGDecoder {
         RGB(3, false),
         RGBA(4, true),
         BGRA(4, true),
-        ABGR(4, true);
+        ABGR(4, true),
+    	PAL(1, false);
 
         final int numComponents;
         final boolean hasAlpha;
@@ -262,10 +263,10 @@ public class PNGDecoder {
      */
     public void decode(ByteBuffer buffer, int stride, Format fmt) throws IOException {
         final int offset = buffer.position();
-        final int lineSize = ((width * bitdepth + 7) / 8) * bytesPerPixel;
+        final int lineSize = ((width * getBitdepth() + 7) / 8) * bytesPerPixel;
         byte[] curLine = new byte[lineSize+1];
         byte[] prevLine = new byte[lineSize+1];
-        byte[] palLine = (bitdepth < 8) ? new byte[width+1] : null;
+        byte[] palLine = (getBitdepth() < 8) ? new byte[width+1] : null;
         
         final Inflater inflater = new Inflater();
         try {
@@ -308,19 +309,24 @@ public class PNGDecoder {
                     }
                     break;
                 case COLOR_INDEXED:
-                    switch(bitdepth) {
-                        case 8: palLine = curLine; break;
-                        case 4: expand4(curLine, palLine); break;
-                        case 2: expand2(curLine, palLine); break;
-                        case 1: expand1(curLine, palLine); break;
-                        default: throw new UnsupportedOperationException("Unsupported bitdepth for this image");
-                    }
-                    switch (fmt) {
-                    case ABGR: copyPALtoABGR(buffer, palLine); break;
-                    case RGBA: copyPALtoRGBA(buffer, palLine); break;
-                    case BGRA: copyPALtoBGRA(buffer, palLine); break;
-                    default: throw new UnsupportedOperationException("Unsupported format for this image");
-                    }
+                	if(fmt == Format.PAL) {
+                		copy(buffer, curLine);
+                	}
+                	else {
+	                    switch(getBitdepth()) {
+	                        case 8: palLine = curLine; break;
+	                        case 4: expand4(curLine, palLine); break;
+	                        case 2: expand2(curLine, palLine); break;
+	                        case 1: expand1(curLine, palLine); break;
+	                        default: throw new UnsupportedOperationException("Unsupported bitdepth for this image");
+	                    }
+	                    switch (fmt) {
+	                    case ABGR: copyPALtoABGR(buffer, palLine); break;
+	                    case RGBA: copyPALtoRGBA(buffer, palLine); break;
+	                    case BGRA: copyPALtoBGRA(buffer, palLine); break;
+	                    default: throw new UnsupportedOperationException("Unsupported format for this image");
+	                    }
+                	}
                     break;
                 default:
                     throw new UnsupportedOperationException("Not yet implemented");
@@ -630,31 +636,31 @@ public class PNGDecoder {
         
         switch (colorType) {
         case COLOR_GREYSCALE:
-            if(bitdepth != 8) {
-                throw new IOException("Unsupported bit depth: " + bitdepth);
+            if(getBitdepth() != 8) {
+                throw new IOException("Unsupported bit depth: " + getBitdepth());
             }
             bytesPerPixel = 1;
             break;
         case COLOR_GREYALPHA:
-            if(bitdepth != 8) {
-                throw new IOException("Unsupported bit depth: " + bitdepth);
+            if(getBitdepth() != 8) {
+                throw new IOException("Unsupported bit depth: " + getBitdepth());
             }
             bytesPerPixel = 2;
             break;
         case COLOR_TRUECOLOR:
-            if(bitdepth != 8) {
-                throw new IOException("Unsupported bit depth: " + bitdepth);
+            if(getBitdepth() != 8) {
+                throw new IOException("Unsupported bit depth: " + getBitdepth());
             }
             bytesPerPixel = 3;
             break;
         case COLOR_TRUEALPHA:
-            if(bitdepth != 8) {
-                throw new IOException("Unsupported bit depth: " + bitdepth);
+            if(getBitdepth() != 8) {
+                throw new IOException("Unsupported bit depth: " + getBitdepth());
             }
             bytesPerPixel = 4;
             break;
         case COLOR_INDEXED:
-            switch(bitdepth) {
+            switch(getBitdepth()) {
             case 8:
             case 4:
             case 2:
@@ -662,7 +668,7 @@ public class PNGDecoder {
                 bytesPerPixel = 1;
                 break;
             default:
-                throw new IOException("Unsupported bit depth: " + bitdepth);
+                throw new IOException("Unsupported bit depth: " + getBitdepth());
             }
             break;
         default:
@@ -833,4 +839,8 @@ public class PNGDecoder {
         }
         return true;
     }
+
+	public int getBitdepth() {
+		return bitdepth;
+	}
 }

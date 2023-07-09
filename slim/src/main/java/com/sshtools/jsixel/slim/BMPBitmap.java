@@ -165,7 +165,7 @@ public class BMPBitmap implements SlimBitmap {
 	}
 
     @Override
-	public void write(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
+	public boolean frame(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
         startPos = buffer.position();
         try {
 	        switch(bpp) {
@@ -182,6 +182,7 @@ public class BMPBitmap implements SlimBitmap {
         catch(IOException ioe) {
         	throw new UncheckedIOException(ioe);
         }
+        return false;
 		
 	}
 
@@ -253,4 +254,10 @@ public class BMPBitmap implements SlimBitmap {
 	private void setPos(ByteBuffer buf, int y) {
         buf.position(startPos + pixelOffset(y) * 4);
     }
+
+	@Override
+	public String toString() {
+		return "BMPBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + "]";
+	}
 }
