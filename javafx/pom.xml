@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.sshtools</groupId>
 		<artifactId>jsixel</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.2</version>
 	</parent>
 	<artifactId>jsixel-javafx</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jsixel-lib</artifactId>
-			<version>${project.version}</version>
+			<version>${project.version}</version> 
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>

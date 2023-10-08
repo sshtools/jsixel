@@ -34,6 +34,13 @@ public class SWTImageBitmapTest extends AbstractImageBitmapTests {
 	}
 
 	@Test
+	public void testGifAnim() throws Exception {
+		simpleTest("/anim.gif", "/results/anim.gif.sixel", bldr -> {
+			bldr.withTransparent(0);
+		});
+	}
+
+	@Test
 	public void testPngIndexed() throws Exception {
 		simpleTest("/test.indexed.png", "/results/test.indexed.png.sixel");
 	}

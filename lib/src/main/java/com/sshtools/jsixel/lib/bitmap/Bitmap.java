@@ -111,6 +111,10 @@ public interface Bitmap {
 	PixelFormat pixelFormat();
 
 	Optional<byte[]> palette();
+	
+	default long delay() {
+		return 0;
+	}
 
 	default boolean hasMoreFrames() {
 		return false;

@@ -21,7 +21,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sshtools</groupId>
 	<artifactId>jsixel</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>jsixel - JNA based Java bindings for libsixel</name>
 	<properties>
 		<maven.compiler.target>11</maven.compiler.target>

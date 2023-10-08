@@ -112,21 +112,21 @@ public final class JavaFXImageBitmap implements Bitmap {
 			throw new UnsupportedOperationException("Conversion not supported.");
 		}
 		
-		if(formatType == FormatType.PALETTE) {
-			switch(image.getPixelReader().getPixelFormat().getType()) {
-//			case BYTE_INDEXED:
-//				var arr = new byte[width() * height()];
-//				var fmt = indexedPixelFormat(Optional.of(palette()));
-//				image.getPixelReader().getPixels(0, 0, width(), height(), pfmt, arr, 0, width());
-//				break;
-			default:
-				throw new UnsupportedOperationException();
-			}
-		}
-		else if(formatType == FormatType.GRAYSCALE) {
-			throw new UnsupportedOperationException();
-		}
-		else {
+		/*
+		 * if(formatType == FormatType.PALETTE) {
+		 * switch(image.getPixelReader().getPixelFormat().getType()) { // case
+		 * BYTE_INDEXED: // var arr = new byte[width() * height()]; // var fmt =
+		 * indexedPixelFormat(Optional.of(palette())); //
+		 * image.getPixelReader().getPixels(0, 0, width(), height(), pfmt, arr, 0,
+		 * width()); // break; default: throw new UnsupportedOperationException(); } }
+		 * else
+		 */ 
+//		if(formatType == FormatType.GRAYSCALE) {
+//			 image.getPixelReader().getP
+//			throw new UnsupportedOperationException();
+//		}
+		/* else */ 
+		if(formatType == FormatType.COLOR) {
 			var type = image.getPixelReader().getPixelFormat().getType();
 			switch(type) {
 			case BYTE_BGRA: {
@@ -167,6 +167,8 @@ public final class JavaFXImageBitmap implements Bitmap {
 				throw new UnsupportedOperationException(type.name());
 			}
 		}
+		else
+			throw new UnsupportedOperationException(formatType.name());
 		
 
 		buffer.flip();
@@ -187,7 +189,9 @@ public final class JavaFXImageBitmap implements Bitmap {
 	public Optional<byte[]> palette() {
 		if(format.indexed()) {
 			/* TODO: cant find how to do this (yet i hope) */
-			throw new UnsupportedOperationException();
+//			if(formatType == )
+//			throw new UnsupportedOperationException();
+			return Optional.empty();
 		}
 		else {
 			return Optional.empty();
@@ -226,9 +230,16 @@ public final class JavaFXImageBitmap implements Bitmap {
 	}
 
 	private static FormatType calcType(Image image) {
-		switch (image.getPixelReader().getPixelFormat().getType()) {
+		var pfmt = image.getPixelReader().getPixelFormat();
+		var type = pfmt.getType();
+		switch (type) {
 		case BYTE_INDEXED:
-			return FormatType.PALETTE;
+			/* TODO: JavaFX image API seems a bit weak compared to java imaging.
+			 * A greyscale image is presented as an indexed image, but indexed image
+			 * aren't ???? Everything happening in this class looks weird, but
+			 * most image formats appear to work
+			 */
+			return FormatType.GRAYSCALE;
 		default:
 			return FormatType.COLOR;
 		}

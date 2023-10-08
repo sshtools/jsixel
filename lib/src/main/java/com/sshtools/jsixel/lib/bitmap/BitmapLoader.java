@@ -10,7 +10,7 @@ import com.sshtools.jsixel.lib.bitmap.Bitmap.BitmapBuilder;
 public interface BitmapLoader<BITMAP extends Bitmap, BUILDER extends BitmapBuilder<?, BITMAP>> {
 	
 	public enum ImageType {
-		PNG, JPEG, BMP, GIF, OTHER
+		PNG, JPEG, BMP, GIF, ICO, TIFF
 	}
 	
 	BUILDER builder();

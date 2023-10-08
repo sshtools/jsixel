@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 
@@ -79,12 +80,13 @@ public final class SWTImageBitmap implements Bitmap {
 
 		@SuppressWarnings("resource")
 		@Override
-		public SWTImageBitmap build() {
+		public SWTImageBitmap build() { 
 			if (image.isPresent()) {
 				return new SWTImageBitmap(image.get());
 			} else {
+				var loader = new ImageLoader();
 				if (readable.isPresent()) {
-					return new SWTImageBitmap(new ImageData(Channels.newInputStream(readable.get())));
+					return new SWTImageBitmap(loader.load(Channels.newInputStream(readable.get())));
 				} else {
 					if (bitmap.isPresent()) {
 						var bm = bitmap.get();
@@ -110,7 +112,7 @@ public final class SWTImageBitmap implements Bitmap {
 						img.data = DataArrays.toByteArray(bm.data());
 						return new SWTImageBitmap(img);
 					} else if (data.isPresent()) {
-						return new SWTImageBitmap(new ImageData(new ByteBufferBackedInputStream(data.get())));
+						return new SWTImageBitmap(loader.load(new ByteBufferBackedInputStream(data.get())));
 					} else {
 						throw new IllegalStateException("No image source supplied.");
 					}
@@ -119,17 +121,18 @@ public final class SWTImageBitmap implements Bitmap {
 		}
 	}
 
-	private final ImageData image;
+	private final ImageData[] images;
 	private final PixelFormat format;
 	private final FormatType formatType;
 	private final Optional<byte[]> palette;
+	private int frame;
 
-	private SWTImageBitmap(ImageData image) {
-		this.image = image;
+	private SWTImageBitmap(ImageData... images) {
+		this.images = images;
 
-		format = calcFormat(image);
-		formatType = calcType(image);
-		palette = calcPalette(image);
+		format = calcFormat(images[0]);
+		formatType = calcType(images[0]);
+		palette = calcPalette(images[0]);
 	}
 
 	private PixelFormat calcFormat(ImageData image) {
@@ -163,19 +166,35 @@ public final class SWTImageBitmap implements Bitmap {
 
 	@Override
 	public int bitsPerPixel() {
-		return image.depth;
+		return images[0].depth;
 	}
 
 	@Override
-	public boolean frame(ByteBuffer buffer, PixelFormat fmt, FormatType formatType) {
-		if (fmt != pixelFormat() || formatType != formatType()) {
+	public boolean frame(ByteBuffer buffer, PixelFormat pixelFormat, FormatType formatType) {
+		if (pixelFormat != pixelFormat() || formatType != formatType()) {
 			throw new UnsupportedOperationException("Conversion not supported");
 		}
-		// TODO lots of conversions here. Also take note of 16 bit image has reversed byte order
-		buffer.put(image.data);
-		
-		buffer.flip();
-		return false;
+		if(frame >= images.length) {
+			frame = 0;
+		}
+		if(frame < images.length) {
+			buffer.put(images[frame].data);
+			
+			buffer.flip();
+			frame++;
+		}
+		return hasMoreFrames();
+
+	}
+	
+	@Override
+	public long delay() {
+		return frame < images.length ? images[frame].delayTime * 10 : 0;
+	}
+
+	@Override
+	public boolean hasMoreFrames() {
+		return frame < images.length;
 	}
 
 	@Override
@@ -185,7 +204,7 @@ public final class SWTImageBitmap implements Bitmap {
 
 	@Override
 	public int height() {
-		return image.height;
+		return images[0].height;
 	}
 
 	@Override
@@ -200,11 +219,11 @@ public final class SWTImageBitmap implements Bitmap {
 
 	@Override
 	public int width() {
-		return image.width;
+		return images[0].width;
 	}
 
-	ImageData image() {
-		return image;
+	ImageData[] images() {
+		return images;
 	}
 
 	private static FormatType calcType(ImageData image) {
@@ -239,9 +258,9 @@ public final class SWTImageBitmap implements Bitmap {
 
 	@Override
 	public String toString() {
-		var pd = paletteInfo(image);
+		var pd = paletteInfo(images[0]);
 		return "SWTImageBitmap [bitsPerPixel()=" + bitsPerPixel() + ",width()=" + width() + ", height()=" + height() + ", pixelFormat()=" + pixelFormat()
-				+ ", formatType()=" + formatType() + ", palette()=" + palette() + ",pd=" + pd + ",transparentPixel=" + image.transparentPixel + ",sourceDpeth" + image.depth + ",type=" + image.type + ",maskPad=" + image.maskPad + "]";
+				+ ", formatType()=" + formatType() + ", palette()=" + palette() + ",pd=" + pd + ",transparentPixel=" + images[0].transparentPixel + ",sourceDpeth" + images[0].depth + ",type=" + images[0].type + ",maskPad=" + images[0].maskPad + "]";
 	}
 
 	private String paletteInfo(ImageData image) {

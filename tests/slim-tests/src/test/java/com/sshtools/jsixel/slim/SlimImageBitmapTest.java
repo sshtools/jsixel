@@ -35,7 +35,7 @@ public class SlimImageBitmapTest extends AbstractImageBitmapTests {
 
 	@Test
 	public void testGifAnim() throws Exception {
-		simpleTest("/anim.gif", "/results/test.alpha.png.sixel", bldr -> {
+		simpleTest("/anim.gif", "/results/anim.gif.sixel", bldr -> {
 			bldr.withTransparent(0);
 		});
 	}

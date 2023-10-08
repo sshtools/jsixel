@@ -22,6 +22,13 @@ public class AWTImageBitmapTest extends AbstractImageBitmapTests {
 	}
 
 	@Test
+	public void testGifAnim() throws Exception {
+		simpleTest("/anim.gif", "/results/anim.gif.sixel", bldr -> {
+			bldr.withTransparent(252);
+		});
+	}
+
+	@Test
 	public void testPng() throws Exception {
 		simpleTest("/test.png", "/results/test.png.sixel");
 	}

@@ -58,6 +58,12 @@ public class GIFBitmap implements SlimBitmap {
 		if (pixelFormat != pixelFormat() || formatType != formatType()) {
 			throw new UnsupportedOperationException("Conversion not supported");
 		}
+		
+		if(data.length == 1) {
+			buffer.asIntBuffer().put(data[0].getData());
+			return false;
+		}
+		
 		if(frame >= data.length) {
 			frame = 0;
 		}
@@ -66,18 +72,30 @@ public class GIFBitmap implements SlimBitmap {
 			if(composite == null) {
 				composite = ByteBuffer.allocateDirect(width * height * 4);
 			}
-
+			
 			var ibuf = composite.asIntBuffer();
 			var thisFrame = data[frame];
-			if(frame == 0) {
+
+			/* TODO need to suppport different frame disposal methods */
+			switch(thisFrame.getDisposalMethod()) {
+			case RESTORE_TO_BACKGROUND:
+				break;
+			case RESTORE_TO_PREVIOUS:
+				break;
+			case NONE:
+			case DO_NOT_DISPOSE:
+				break;
+			}
+
+			var fbuf = thisFrame.getData();
+			var frameHeight = thisFrame.getHeight();
+			var frameWidth = thisFrame.getWidth();
+			var frameTop = thisFrame.getTopPos();
+			var frameLeft = thisFrame.getLeftPos();
+			if(frame == 0 && frameHeight == height && frameWidth == width && frameTop == 0 && frameLeft == 0) {
 				ibuf.put(thisFrame.getData());
 			}
 			else {
-				var fbuf = thisFrame.getData();
-				var frameHeight = thisFrame.getHeight();
-				var frameWidth = thisFrame.getWidth();
-				var frameTop = thisFrame.getTopPos();
-				var frameLeft = thisFrame.getLeftPos();
 				for(var y = 0 ; y < frameHeight; y++) {
 					var offset = (( y  + frameTop ) * width) + frameLeft;
 					for(var x = 0 ; x < frameWidth; x++) {
@@ -94,6 +112,11 @@ public class GIFBitmap implements SlimBitmap {
 		}
 		return hasMoreFrames();
 
+	}
+	
+	@Override
+	public long delay() {
+		return frame < data.length ? data[frame].getDelay() * 10 : 0;
 	}
 
 	@Override

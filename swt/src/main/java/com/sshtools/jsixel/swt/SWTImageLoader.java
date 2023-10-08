@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
 import com.sshtools.jsixel.lib.bitmap.BitmapLoader;
@@ -27,7 +26,7 @@ public class SWTImageLoader implements BitmapLoader<SWTImageBitmap, SWTImageBitm
 	@Override
 	public void save(ImageType type, SWTImageBitmap bitmap, OutputStream output) throws IOException {
 		var iloader = new ImageLoader();
-		iloader.data = new ImageData[] { bitmap.image() };
+		iloader.data = bitmap.images();
 		switch (type) {
 		case BMP:
 			iloader.save(output, SWT.IMAGE_BMP);
@@ -40,6 +39,12 @@ public class SWTImageLoader implements BitmapLoader<SWTImageBitmap, SWTImageBitm
 			break;
 		case PNG:
 			iloader.save(output, SWT.IMAGE_PNG);
+			break;
+		case ICO:
+			iloader.save(output, SWT.IMAGE_ICO);
+			break;
+		case TIFF:
+			iloader.save(output, SWT.IMAGE_TIFF);
 			break;
 		default:
 			throw new UnsupportedOperationException();
