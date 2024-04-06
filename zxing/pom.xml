@@ -8,25 +8,17 @@
 		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>jsixel-tests</artifactId>
-	<packaging>pom</packaging>
-	<properties>
-		<junit.version>4.13.2</junit.version>
-	</properties>
-	<modules>
-		<module>lib-tests</module>
-		<module>awt-tests</module>
-		<module>swt-tests</module>
-		<module>javafx-tests</module>
-		<module>slim-tests</module>
-		<module>zxing-tests</module>
-	</modules>
+	<artifactId>jsixel-zxing</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>core</artifactId>
+		    <version>3.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sshtools</groupId>
+			<artifactId>jsixel-lib</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
