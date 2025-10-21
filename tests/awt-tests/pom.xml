@@ -8,6 +8,10 @@
 		<version>0.3.0</version>
 		<relativePath>../</relativePath>
 	</parent>
+	<properties>
+    	<skipAWTTests>false</skipAWTTests>
+    	<maven.test.skip>${skipAWTTests}</maven.test.skip>
+	</properties>
 	<artifactId>jsixel-awt-tests</artifactId>
 	<dependencies>
 		<dependency>

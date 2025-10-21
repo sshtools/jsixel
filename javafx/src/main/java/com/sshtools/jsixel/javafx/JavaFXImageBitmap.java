@@ -213,35 +213,49 @@ public final class JavaFXImageBitmap implements Bitmap {
 	}
 
 	private PixelFormat calcFormat(Image image) {
-		switch (image.getPixelReader().getPixelFormat().getType()) {
-		case BYTE_BGRA:
-		case BYTE_BGRA_PRE:
-			return PixelFormat.BGRA8888;
-		case BYTE_INDEXED:
-			return PixelFormat.PAL8;
-		case INT_ARGB:
-		case INT_ARGB_PRE:
-			return PixelFormat.ARGB8888;
-		case BYTE_RGB:
-			return PixelFormat.RGB888;
-		default:
+		var rdr = image.getPixelReader();
+		if(rdr == null) {
+			/* Not readable / writable? */
 			throw new UnsupportedOperationException();
+		}
+		else {
+			switch (rdr.getPixelFormat().getType()) {
+			case BYTE_BGRA:
+			case BYTE_BGRA_PRE:
+				return PixelFormat.BGRA8888;
+			case BYTE_INDEXED:
+				return PixelFormat.PAL8;
+			case INT_ARGB:
+			case INT_ARGB_PRE:
+				return PixelFormat.ARGB8888;
+			case BYTE_RGB:
+				return PixelFormat.RGB888;
+			default:
+				throw new UnsupportedOperationException();
+			}
 		}
 	}
 
 	private static FormatType calcType(Image image) {
-		var pfmt = image.getPixelReader().getPixelFormat();
-		var type = pfmt.getType();
-		switch (type) {
-		case BYTE_INDEXED:
-			/* TODO: JavaFX image API seems a bit weak compared to java imaging.
-			 * A greyscale image is presented as an indexed image, but indexed image
-			 * aren't ???? Everything happening in this class looks weird, but
-			 * most image formats appear to work
-			 */
-			return FormatType.GRAYSCALE;
-		default:
-			return FormatType.COLOR;
+		var rdr = image.getPixelReader();
+		if(rdr == null) {
+			/* Not readable / writable? */
+			throw new UnsupportedOperationException();
+		}
+		else {
+			var pfmt = rdr.getPixelFormat();
+			var type = pfmt.getType();
+			switch (type) {
+			case BYTE_INDEXED:
+				/* TODO: JavaFX image API seems a bit weak compared to java imaging.
+				 * A greyscale image is presented as an indexed image, but indexed image
+				 * aren't ???? Everything happening in this class looks weird, but
+				 * most image formats appear to work
+				 */
+				return FormatType.GRAYSCALE;
+			default:
+				return FormatType.COLOR;
+			}
 		}
 	}
 
